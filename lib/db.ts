@@ -20,7 +20,7 @@ export async function db(): Promise<Client> {
     globalThis._mavxTursoReady = client
       .batch(
         [
-          `CREATE TABLE IF NOT EXISTS projects (
+          `CREATE TABLE IF NOT EXISTS mavx_projects (
             id TEXT PRIMARY KEY,
             slug TEXT NOT NULL UNIQUE,
             title TEXT NOT NULL,
@@ -33,7 +33,7 @@ export async function db(): Promise<Client> {
             shape TEXT NOT NULL DEFAULT 'tall',
             created_at TEXT NOT NULL
           )`,
-          `CREATE TABLE IF NOT EXISTS enquiries (
+          `CREATE TABLE IF NOT EXISTS mavx_enquiries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             contact TEXT NOT NULL,
@@ -41,7 +41,7 @@ export async function db(): Promise<Client> {
             message TEXT NOT NULL DEFAULT '',
             at TEXT NOT NULL
           )`,
-          `CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT)`
+          `CREATE TABLE IF NOT EXISTS mavx_meta (key TEXT PRIMARY KEY, value TEXT)`
         ],
         'write'
       )

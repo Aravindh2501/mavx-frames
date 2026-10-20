@@ -75,7 +75,7 @@ async function storeEntry(entry: Entry): Promise<boolean> {
     if (hasDb()) {
       const c = await db()
       await c.execute({
-        sql: 'INSERT INTO enquiries (name, contact, type, message, at) VALUES (?, ?, ?, ?, ?)',
+        sql: 'INSERT INTO mavx_enquiries (name, contact, type, message, at) VALUES (?, ?, ?, ?, ?)',
         args: [entry.name, entry.contact, entry.type, entry.message, entry.at]
       })
       return true

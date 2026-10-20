@@ -60,7 +60,7 @@ const toProject = (r: Row): Project => ({
   createdAt: String(r.created_at)
 })
 
-const insertSql = `INSERT OR IGNORE INTO projects
+const insertSql = `INSERT OR IGNORE INTO mavx_projects
   (id, slug, title, category, location, description, cover, photos, reels, shape, created_at)
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
@@ -81,9 +81,9 @@ const insertArgs = (p: Project) => [
 async function client() {
   const c = await db()
   // First run only: copy the projects already in data/projects.json into Turso.
-  const seeded = await c.execute({ sql: 'SELECT value FROM meta WHERE key = ?', args: ['projects-seeded'] })
+  const seeded = await c.execute({ sql: 'SELECT value FROM mavx_meta WHERE key = ?', args: ['projects-seeded'] })
   if (!seeded.rows.length) {
-    const count = await c.execute('SELECT COUNT(*) AS n FROM projects')
+    const count = await c.execute('SELECT COUNT(*) AS n FROM mavx_projects')
     const seed = await loadSeed()
     if (Number((count.rows[0] as unknown as Row).n) === 0 && seed.length) {
       await c.batch(
@@ -92,7 +92,7 @@ async function client() {
       )
     }
     await c.execute({
-      sql: 'INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)',
+      sql: 'INSERT OR REPLACE INTO mavx_meta (key, value) VALUES (?, ?)',
       args: ['projects-seeded', new Date().toISOString()]
     })
   }
@@ -136,7 +136,7 @@ export async function getProjects(): Promise<Project[]> {
   if (hasDb()) {
     try {
       const c = await client()
-      const res = await c.execute('SELECT * FROM projects ORDER BY created_at DESC')
+      const res = await c.execute('SELECT * FROM mavx_projects ORDER BY created_at DESC')
       return normalize(res.rows.map((r) => toProject(r as unknown as Row)))
     } catch (err) {
       console.error('[store] getProjects failed', err)
@@ -218,11 +218,11 @@ export async function createProject(input: ProjectInput) {
 export async function updateProject(id: string, input: ProjectInput) {
   if (hasDb()) {
     const c = await client()
-    const found = await c.execute({ sql: 'SELECT * FROM projects WHERE id = ?', args: [id] })
+    const found = await c.execute({ sql: 'SELECT * FROM mavx_projects WHERE id = ?', args: [id] })
     if (!found.rows.length) return null
     const next: Project = { ...toProject(found.rows[0] as unknown as Row), ...input }
     await c.execute({
-      sql: `UPDATE projects SET title = ?, category = ?, location = ?, description = ?,
+      sql: `UPDATE mavx_projects SET title = ?, category = ?, location = ?, description = ?,
             cover = ?, photos = ?, reels = ?, shape = ? WHERE id = ?`,
       args: [
         next.title,
@@ -250,7 +250,7 @@ export async function updateProject(id: string, input: ProjectInput) {
 export async function deleteProject(id: string) {
   if (hasDb()) {
     const c = await client()
-    const res = await c.execute({ sql: 'DELETE FROM projects WHERE id = ?', args: [id] })
+    const res = await c.execute({ sql: 'DELETE FROM mavx_projects WHERE id = ?', args: [id] })
     return res.rowsAffected > 0
   }
   const list = await readFileList()
