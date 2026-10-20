@@ -92,7 +92,6 @@ export default function WorkGallery({ projects }: { projects: Project[] }) {
     <section ref={root} className="mx-auto max-w-[1280px] px-6 pb-24 pt-20 md:px-10 md:pt-28">
       <div className="wg-head flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="section-kicker">The collection</p>
           <h2 className="font-serif text-[clamp(2.4rem,5.5vw,4.5rem)] leading-none tracking-[-0.03em]">
             Every story, <span className="italic text-accent">told.</span>
           </h2>

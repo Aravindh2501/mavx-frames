@@ -131,7 +131,6 @@ export default function ProjectDetail({ project, next }: { project: Project; nex
       </div>
 
       <section className="mx-auto max-w-[1280px] px-6 pt-14 md:px-10">
-        <p className="section-kicker">{project.id.startsWith('default-') ? 'Illustrative sample collection' : 'The stills'}</p>
         <h2 className="font-serif text-4xl tracking-tight md:text-5xl">The photographs</h2>
         
         <div className="mt-10 grid grid-cols-1 gap-3 md:grid-cols-12 md:gap-4">

@@ -244,8 +244,6 @@ body {
 h1, h2, h3 { font-family: 'Manrope', sans-serif; font-weight: 500; }
 h2 { letter-spacing: -.055em; }
 p { text-wrap: pretty; }
-.section-kicker { display: flex; align-items: center; gap: .65rem; font-size: .65rem; letter-spacing: .2em; text-transform: uppercase; color: rgb(var(--mute)); margin-bottom: 1.25rem; }
-.section-kicker::before { content: ''; width: .35rem; height: .35rem; border-radius: 50%; background: rgb(var(--accent)); }
 button:focus-visible, a:focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 6px; }
 .work-tab { padding: .75rem 1rem; border: 0; background: transparent; border-radius: 0; }
 .focus-card { width: 42vw; }
@@ -312,4 +310,34 @@ h1 .text-accent, h2 .text-accent, h3 .text-accent {
 }
 @media (forced-colors: active) {
   h1 .text-accent, h2 .text-accent, h3 .text-accent { -webkit-text-fill-color: currentColor; background: none; }
+}
+
+
+/* ------------------------------------------------------------------
+   MAV X Frames Logo
+------------------------------------------------------------------- */
+
+.brand-logo {
+  display: block;
+  width: var(--logo-width, 240px);
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  transition: opacity 0.3s ease;
+}
+
+/* Explicit theme variants */
+.logo-light {
+  color-scheme: light;
+}
+
+.logo-dark {
+  color-scheme: dark;
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .brand-logo {
+    transition: none;
+  }
 }

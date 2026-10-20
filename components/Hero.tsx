@@ -38,8 +38,8 @@ export default function Hero({ images }: Props) {
       <div className="mx-auto max-w-[1280px] px-6 md:px-10">
         <div className="home-hero-grid">
           <div className="home-hero-copy">
-            <p className="section-kicker">MAVX Frames · Photography & films</p>
             <h1 className="font-serif text-[clamp(3.2rem,7.2vw,6.5rem)] leading-[1.02] tracking-[-0.07em]">
+              <span className="sr-only">MAVX Frames — wedding and event photographer in Chennai, travelling across Tamil Nadu. </span>
               <span className="block overflow-hidden py-[0.06em]">
                 <span className="hero-line block">The art</span>
               </span>
@@ -59,17 +59,17 @@ export default function Hero({ images }: Props) {
           <div className="home-hero-media">
             <div className="home-hero-portrait">
               <div className="hero-frame relative aspect-[4/5] overflow-hidden shadow-[0_24px_60px_-24px_rgba(20,18,17,0.35)] md:aspect-[0.55]">
-                <Photo src={images.portrait} alt="" priority sizes="(min-width:768px) 28vw, 100vw" className="object-cover" />
+                <Photo src={images.portrait} alt="Wedding portrait by MAVX Frames, photographer in Chennai" priority sizes="(min-width:768px) 28vw, 100vw" className="object-cover" />
               </div>
             </div>
             <div className="home-hero-small">
               <div className="hero-frame relative aspect-[4/3] overflow-hidden shadow-[0_24px_60px_-24px_rgba(20,18,17,0.35)] md:aspect-[1.4]">
-                <Photo src={images.small} alt="" priority sizes="(min-width:768px) 23vw, 50vw" className="object-cover" />
+                <Photo src={images.small} alt="Candid wedding moment photographed by MAVX Frames in Tamil Nadu" priority sizes="(min-width:768px) 23vw, 50vw" className="object-cover" />
               </div>
             </div>
             <div className="home-hero-wide">
               <div className="hero-frame relative aspect-[4/3] overflow-hidden shadow-[0_24px_60px_-24px_rgba(20,18,17,0.35)] md:aspect-[2.5]">
-                <Photo src={images.wide} alt="" priority sizes="(min-width:768px) 40vw, 50vw" className="object-cover" />
+                <Photo src={images.wide} alt="Wedding photography in Chennai and Coimbatore by MAVX Frames" priority sizes="(min-width:768px) 40vw, 50vw" className="object-cover" />
               </div>
             </div>
           </div>

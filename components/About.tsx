@@ -49,7 +49,6 @@ export default function About() {
   return (
     <section id="about" ref={root} className="mx-auto max-w-[1280px] px-6 py-24 md:px-10 md:py-36">
       <div className="about-label">
-        <p className="section-kicker">The person behind the pictures</p>
         <h2 className="font-serif text-3xl md:text-4xl">Behind the Lens</h2>
         
       </div>

@@ -17,7 +17,6 @@ export default function InFocus({ projects }: { projects: Project[] }) {
   const root = useRef<HTMLElement>(null)
   const pin = useRef<HTMLDivElement>(null)
   const track = useRef<HTMLDivElement>(null)
-  const bar = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     document.fonts?.ready.then(() => ScrollTrigger.refresh())
@@ -47,12 +46,7 @@ export default function InFocus({ projects }: { projects: Project[] }) {
           // Lenis already smooths the scroll — extra scrub lag here made it feel slow
           scrub: true,
           anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            if (bar.current) {
-              bar.current.style.transform = `scaleX(${0.06 + self.progress * 0.94})`
-            }
-          }
+          invalidateOnRefresh: true
         }
       })
 
@@ -106,7 +100,6 @@ export default function InFocus({ projects }: { projects: Project[] }) {
       <div ref={pin} className="flex h-[100svh] flex-col overflow-hidden bg-paper pt-24 md:pt-28">
         <div className="focus-head flex items-end justify-between px-[6vw] pb-12">
           <div>
-            <p className="section-kicker">{projects.some((p) => p.id.startsWith('default-')) ? 'Sample collection' : 'A closer look'}</p>
             <h2 className="font-serif text-4xl tracking-tight md:text-6xl">In Focus</h2>
             
           </div>
@@ -213,15 +206,7 @@ export default function InFocus({ projects }: { projects: Project[] }) {
           </div>
         </div>
 
-        <div className="px-[6vw] pb-8 pt-4">
-          <div className="relative h-px bg-line">
-            <div
-              ref={bar}
-              className="absolute left-0 top-0 h-px w-full origin-left bg-ink"
-              style={{ transform: 'scaleX(0.06)' }}
-            />
-          </div>
-        </div>
+        <div className="pb-8" />
       </div>
     </section>
   )

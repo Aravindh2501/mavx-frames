@@ -6,7 +6,12 @@ import { getProjects } from '@/lib/store'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata = { title: 'Work — MAVX Frames' }
+export const metadata = {
+  title: 'Wedding & Pre-Wedding Photography Portfolio',
+  description:
+    'Browse wedding, pre-wedding, portrait and commercial photography stories by MAVX Frames, a Chennai photographer who travels across Tamil Nadu.',
+  alternates: { canonical: '/work' }
+}
 
 export default async function WorkPage() {
   const projects = await getProjects()
