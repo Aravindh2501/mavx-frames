@@ -6,24 +6,11 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import Photo from './Photo'
-import { ArrowRight, PencilIcon, PlusIcon } from './Icons'
+import { PencilIcon, PlusIcon } from './Icons'
 import { useUI } from './UIProvider'
-import type { Project, Shape } from '@/lib/types'
+import type { Project } from '@/lib/types'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
-
-const SHAPES: Record<Shape, { h: number; r: number; radius?: string; clip?: string }> = {
-  tall: { h: 1, r: 0.625 },
-  wide: { h: 0.62, r: 1.4 },
-  arch: { h: 0.9, r: 0.75, radius: '999px 999px 0 0' },
-  square: { h: 0.62, r: 1 },
-  circle: { h: 0.72, r: 1, radius: '50%' },
-  pill: { h: 1, r: 0.4, radius: '999px' },
-  slant: { h: 0.82, r: 0.8, clip: 'polygon(0 7%, 100% 0, 100% 93%, 0 100%)' },
-  triangle: { h: 0.9, r: 1, clip: 'polygon(50% 0, 100% 100%, 0 100%)' }
-}
-
-const ALIGN = ['flex-start', 'center', 'flex-end', 'center']
 
 export default function InFocus({ projects }: { projects: Project[] }) {
   const { isEdit, href, openEditor, openContact } = useUI()
@@ -42,6 +29,11 @@ export default function InFocus({ projects }: { projects: Project[] }) {
       const pinEl = pin.current
       if (!trackEl || !pinEl) return
 
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        pinEl.style.height = 'auto'; trackEl.style.position = 'relative'; trackEl.style.width = '100%'; trackEl.style.flexWrap = 'wrap';
+        return () => { pinEl.style.height = ''; trackEl.style.position = ''; trackEl.style.width = ''; trackEl.style.flexWrap = '' }
+      }
+
       const dist = () => Math.max(0, trackEl.scrollWidth - window.innerWidth)
 
       const tween = gsap.to(trackEl, {
@@ -50,9 +42,10 @@ export default function InFocus({ projects }: { projects: Project[] }) {
         scrollTrigger: {
           trigger: pinEl,
           start: 'top top',
-          end: () => `+=${dist()}`,
+          end: () => `+=${dist() * 0.85}`,
           pin: true,
-          scrub: 0.7,
+          // Lenis already smooths the scroll — extra scrub lag here made it feel slow
+          scrub: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
@@ -68,9 +61,10 @@ export default function InFocus({ projects }: { projects: Project[] }) {
         if (img) {
           gsap.fromTo(
             img,
-            { xPercent: -7 },
+            { xPercent: -7, scale: 0.96 },
             {
               xPercent: 7,
+              scale: 1,
               ease: 'none',
               scrollTrigger: {
                 trigger: card,
@@ -83,9 +77,9 @@ export default function InFocus({ projects }: { projects: Project[] }) {
           )
         }
         gsap.from(card, {
-          y: 70,
+          y: 50,
           autoAlpha: 0,
-          duration: 1,
+          duration: 0.9,
           ease: 'power3.out',
           scrollTrigger: {
             trigger: card,
@@ -104,22 +98,23 @@ export default function InFocus({ projects }: { projects: Project[] }) {
         scrollTrigger: { trigger: root.current, start: 'top 80%' }
       })
     },
-    { scope: root, dependencies: [projects.length, isEdit], revertOnUpdate: true }
+    { scope: root, dependencies: [projects, isEdit], revertOnUpdate: true }
   )
 
   return (
     <section id="in-focus" ref={root} className="relative">
       <div ref={pin} className="flex h-[100svh] flex-col overflow-hidden bg-paper pt-24 md:pt-28">
-        <div className="focus-head flex items-end justify-between px-[6vw] pb-6">
+        <div className="focus-head flex items-end justify-between px-[6vw] pb-12">
           <div>
-            <h2 className="font-serif text-4xl tracking-tight md:text-5xl">In Focus</h2>
-            <span className="rule" />
+            <p className="section-kicker">{projects.some((p) => p.id.startsWith('default-')) ? 'Sample collection' : 'A closer look'}</p>
+            <h2 className="font-serif text-4xl tracking-tight md:text-6xl">In Focus</h2>
+            
           </div>
           <Link
             href={href('/work')}
             className="flex items-center gap-2 text-xs text-ink/80 transition-colors hover:text-accent"
           >
-            Scroll to discover more <ArrowRight width={16} height={16} />
+            Explore all work
           </Link>
         </div>
 
@@ -129,7 +124,7 @@ export default function InFocus({ projects }: { projects: Project[] }) {
         >
           <div
             ref={track}
-            className="absolute inset-y-0 left-0 flex w-max items-stretch gap-[7vw] pl-[6vw] pr-[12vw]"
+            className="gpu absolute inset-y-0 left-0 flex w-max items-stretch focus-track"
           >
             {isEdit && (
               <div className="focus-card flex shrink-0 self-center">
@@ -148,30 +143,37 @@ export default function InFocus({ projects }: { projects: Project[] }) {
             )}
 
             {projects.map((p, i) => {
-              const s = SHAPES[p.shape] ?? SHAPES.tall
-              const width = `calc(var(--track-h) * ${(s.h * s.r).toFixed(3)})`
+              const width = '100%'
               return (
                 <article
                   key={p.id}
                   className="focus-card group relative flex shrink-0 flex-col"
-                  style={{ alignSelf: ALIGN[i % ALIGN.length], width: `max(${width}, 11rem)` }}
+                  style={{ alignSelf: i % 2 === 0 ? 'flex-end' : 'flex-start' }}
                 >
                   <Link href={href(`/work/${p.slug}`)} className="block">
                     <div
-                      className="relative overflow-hidden bg-line"
+                      className="focus-media relative overflow-hidden bg-line"
                       style={{
                         width,
-                        height: `calc(var(--track-h) * ${s.h})`,
-                        borderRadius: s.radius,
-                        clipPath: s.clip
+                        borderRadius: p.shape === 'arch' ? '999px 999px 0 0' : p.shape === 'circle' || p.shape === 'pill' ? '999px' : undefined,
+                        clipPath: p.shape === 'slant' ? 'polygon(0 7%,100% 0,100% 93%,0 100%)' : p.shape === 'triangle' ? 'polygon(50% 0,100% 100%,0 100%)' : undefined,
+                        
+                        
+                        
                       }}
                     >
-                      <Photo
-                        src={p.cover}
-                        alt={p.title}
-                        sizes="(min-width:768px) 40vw, 80vw"
-                        className="focus-img !-left-[9%] !w-[118%] !max-w-none object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.05]"
-                      />
+                      {/* GSAP moves .focus-img; hover zoom lives on the inner div so CSS
+                          transitions never fight the scroll-driven transform */}
+                      <div className="focus-img gpu absolute inset-y-0 -left-[9%] w-[118%]">
+                        <div className="relative h-full w-full transition-transform duration-[900ms] ease-out group-hover:scale-[1.05]">
+                          <Photo
+                            src={p.cover}
+                            alt={p.title}
+                            sizes="(min-width:768px) 40vw, 80vw"
+                            className="object-cover"
+                          />
+                        </div>
+                      </div>
                     </div>
                     <div className="mt-4 flex items-baseline justify-between gap-4">
                       <div>

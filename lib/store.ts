@@ -23,7 +23,20 @@ async function save(list: Project[]) {
 export async function getProjects(): Promise<Project[]> {
   try {
     await ensure()
-    return JSON.parse(await fs.readFile(file, 'utf8')) as Project[]
+    const list = JSON.parse(await fs.readFile(file, 'utf8')) as Project[]
+    return list.map((project) => {
+      const sample = defaultProjects.find((p) => p.id === project.id)
+      if (!sample) return project
+      const placeholder = (url: string) => /^https:\/\/(?:fastly\.)?picsum\.photos\//.test(url)
+      return {
+        ...project,
+        cover: placeholder(project.cover) ? sample.cover : project.cover,
+        photos: project.photos.some(placeholder)
+          ? [...sample.photos, ...project.photos.filter((url) => !placeholder(url))]
+          : project.photos,
+        reels: project.reels.filter((reel) => !/^https:\/\/res\.cloudinary\.com\/demo\/video\/upload\/(dog|elephants|sea-turtle)\.mp4$/.test(reel.src))
+      }
+    })
   } catch {
     return defaultProjects
   }
@@ -42,7 +55,7 @@ const slugify = (s: string) =>
     .slice(0, 60) || 'story'
 
 const isUrl = (v: unknown): v is string =>
-  typeof v === 'string' && /^https?:\/\//.test(v)
+  typeof v === 'string' && (/^https?:\/\//.test(v) || /^\/images\/[a-z0-9][a-z0-9._-]*$/i.test(v))
 
 const text = (v: unknown, max: number) =>
   typeof v === 'string' ? v.trim().slice(0, max) : ''

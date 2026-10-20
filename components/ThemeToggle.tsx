@@ -10,6 +10,17 @@ export default function ThemeToggle() {
 
   useEffect(() => {
     setDark(document.documentElement.classList.contains('dark'))
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    const sync = () => {
+      let saved: string | null = null
+      try { saved = localStorage.getItem('theme') } catch {}
+      const next = saved ? saved === 'dark' : media.matches
+      document.documentElement.classList.toggle('dark', next)
+      setDark(next)
+    }
+    media.addEventListener('change', sync)
+    window.addEventListener('storage', sync)
+    return () => { media.removeEventListener('change', sync); window.removeEventListener('storage', sync) }
   }, [])
 
   const toggle = () => {
@@ -19,11 +30,11 @@ export default function ThemeToggle() {
       localStorage.setItem('theme', next ? 'dark' : 'light')
     } catch {}
     setDark(next)
-    if (icon.current) {
+    if (icon.current && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       gsap.fromTo(
         icon.current,
-        { rotate: -90, scale: 0.5, autoAlpha: 0 },
-        { rotate: 0, scale: 1, autoAlpha: 1, duration: 0.5, ease: 'back.out(1.7)' }
+        { rotate: -70, scale: 0.6, opacity: 0 },
+        { rotate: 0, scale: 1, opacity: 1, duration: 0.6, ease: 'power3.out', clearProps: 'all' }
       )
     }
   }
@@ -33,10 +44,10 @@ export default function ThemeToggle() {
       onClick={toggle}
       aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
       title={dark ? 'Light mode' : 'Dark mode'}
-      className="nav-item flex h-8 w-8 items-center justify-center rounded-full transition-opacity hover:opacity-60"
+      className="nav-icon-btn"
     >
       <span ref={icon} className="flex">
-        {dark ? <SunIcon width={18} height={18} /> : <MoonIcon width={18} height={18} />}
+        {dark ? <SunIcon width={17} height={17} /> : <MoonIcon width={17} height={17} />}
       </span>
     </button>
   )

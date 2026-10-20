@@ -20,6 +20,15 @@ export default async function Home() {
       <Hero images={images} />
       <InFocus projects={projects} />
       <About />
+      <section aria-label="Our philosophy" className="mx-auto max-w-[1280px] px-6 pb-24 md:px-10 md:pb-36">
+        <figure className="portfolio-quote relative isolate overflow-hidden px-8 py-16 text-center md:px-20 md:py-24">
+          <p className="relative mb-8 text-[10px] uppercase tracking-[0.28em] text-[#F3EAE5]/70">More than a photograph</p>
+          <blockquote className="relative mx-auto max-w-[20ch] font-serif text-[clamp(2rem,4.5vw,4.5rem)] font-medium leading-[1.15] tracking-[-0.045em]">
+            Some moments pass.<br />The feeling stays.
+          </blockquote>
+          <figcaption className="relative mt-9 text-xs tracking-[0.14em] text-[#F3EAE5]/75">MAVX Frames</figcaption>
+        </figure>
+      </section>
       <Footer variant="home" />
     </main>
   )

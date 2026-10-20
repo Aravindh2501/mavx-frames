@@ -4,8 +4,8 @@ export const site = {
   instagram: 'https://instagram.com/',
   youtube: 'https://youtube.com/',
   email: 'mailto:hello@example.com',
-  aboutImage: 'https://picsum.photos/seed/aravindh-portrait/900/1000?grayscale',
-  contactImage: 'https://picsum.photos/seed/garland-bell/700/1000',
+  aboutImage: '/images/the-hands-that-hold.png',
+  contactImage: '/images/threads-of-gold.png',
   aboutHeading: ['Real people.', 'Unrepeatable', 'moments.'],
   aboutText:
     'I’m Aravindh, founder of MAVX Frames, a wedding photography brand based in Chennai. I look for the little glances, the quiet promises, and everything in between — the moments that make your story yours.',

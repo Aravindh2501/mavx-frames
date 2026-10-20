@@ -2,9 +2,12 @@
 
 Next.js 15 + GSAP + Tailwind, with Cloudinary uploads.
 
+See `CHANGES.md` for this update and the included demonstration media.
+
 ## Run
 
     pnpm install
+    # Only on a fresh setup (keep your existing .env.local):
     cp .env.example .env.local
     pnpm dev
 

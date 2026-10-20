@@ -12,8 +12,8 @@ module.exports = {
         accent: 'rgb(var(--accent) / <alpha-value>)'
       },
       fontFamily: {
-        serif: ['Newsreader', 'Georgia', 'serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif']
+        serif: ['Manrope', 'sans-serif'],
+        sans: ['DM Sans', 'system-ui', 'sans-serif']
       }
     }
   },

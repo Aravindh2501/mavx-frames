@@ -49,8 +49,9 @@ export default function About() {
   return (
     <section id="about" ref={root} className="mx-auto max-w-[1280px] px-6 py-24 md:px-10 md:py-36">
       <div className="about-label">
-        <h2 className="font-serif text-2xl">Behind the Lens</h2>
-        <span className="rule" />
+        <p className="section-kicker">The person behind the pictures</p>
+        <h2 className="font-serif text-3xl md:text-4xl">Behind the Lens</h2>
+        
       </div>
       <div className="mt-10 grid items-center gap-10 md:grid-cols-[0.8fr_1.2fr] md:gap-16">
         <div className="about-frame relative aspect-[1/1.05] overflow-hidden bg-line md:ml-[12%]">
@@ -64,7 +65,7 @@ export default function About() {
               </span>
             ))}
           </h3>
-          <p className="about-text mt-7 max-w-md font-serif text-[15px] leading-relaxed text-mute">
+          <p className="about-text mt-7 max-w-md font-sans text-base leading-relaxed text-mute">
             {site.aboutText}
           </p>
         </div>

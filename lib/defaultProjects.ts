@@ -1,22 +1,20 @@
-import type { Project, Reel, Shape } from './types'
+import type { Project, Shape } from './types'
 
-const img = (seed: string, w: number, h: number) =>
-  `https://picsum.photos/seed/${seed}/${w}/${h}`
-
-const clips = [
-  'https://res.cloudinary.com/demo/video/upload/dog.mp4',
-  'https://res.cloudinary.com/demo/video/upload/elephants.mp4',
-  'https://res.cloudinary.com/demo/video/upload/sea-turtle.mp4'
-]
-
-const sizes: [number, number][] = [
-  [1600, 1000],
-  [1000, 1400],
-  [1200, 1200],
-  [1400, 1000],
-  [1000, 1300],
-  [1600, 900]
-]
+// Locally bundled AI-generated demonstration photography. Replace with your own work.
+const photo = (slug: string) => `/images/${slug}.png`
+const collections: Record<string, string[]> = {
+  'a-love-quietly-told': ['a-love-quietly-told', 'threads-of-gold', 'the-hands-that-hold', 'before-the-vows'],
+  'in-her-own-light': ['in-her-own-light'],
+  'threads-of-gold': ['threads-of-gold', 'the-hands-that-hold'],
+  'the-hands-that-hold': ['the-hands-that-hold'],
+  'evening-softly': ['evening-softly'],
+  'beneath-the-marigolds': ['beneath-the-marigolds'],
+  'before-the-vows': ['before-the-vows'],
+  'little-lanterns': ['little-lanterns'],
+  'waiting-for-you': ['waiting-for-you'],
+  'brew-and-brass': ['brew-and-brass'],
+  'city-in-silk': ['city-in-silk', 'in-her-own-light']
+}
 
 const make = (
   slug: string,
@@ -36,18 +34,10 @@ const make = (
   location,
   description,
   shape,
-  cover: img(`${slug}-cover`, 1800, 1200),
-  photos: Array.from({ length: photoCount }, (_, i) => {
-    const [w, h] = sizes[i % sizes.length]
-    return img(`${slug}-${i}`, w, h)
-  }),
-  reels: Array.from(
-    { length: reelCount },
-    (_, i): Reel => ({
-      src: clips[i % clips.length],
-      poster: img(`${slug}-reel-${i}`, 720, 1280)
-    })
-  ),
+  cover: photo(slug),
+  photos: (collections[slug] ?? [slug]).map(photo),
+  // No unrelated animal stock clips: add your actual reels using owner mode.
+  reels: [],
   createdAt: new Date(Date.UTC(2026, 8, day)).toISOString()
 })
 
