@@ -1,0 +1,198 @@
+[
+  {
+    "title": "siva",
+    "category": "Portraits",
+    "location": "chennai",
+    "description": "An outdoor terrace portrait shoot capturing Siva’s natural style and personality in soft natural light.",
+    "cover": "https://res.cloudinary.com/dlaiic9oi/image/upload/v1792515366/aravindh-portfolio/lhzrr5osnuqqa1yrbpvm.webp",
+    "photos": [
+      "https://res.cloudinary.com/dlaiic9oi/image/upload/v1792515366/aravindh-portfolio/lhzrr5osnuqqa1yrbpvm.webp",
+      "https://res.cloudinary.com/dlaiic9oi/image/upload/v1792515346/aravindh-portfolio/e9oa2bsz1lwecno2kpqk.webp",
+      "https://res.cloudinary.com/dlaiic9oi/image/upload/v1792515346/aravindh-portfolio/l6xpafylaa94mkqii7lo.webp",
+      "https://res.cloudinary.com/dlaiic9oi/image/upload/v1792515346/aravindh-portfolio/otn3sygxcfroke5smlza.webp",
+      "https://res.cloudinary.com/dlaiic9oi/image/upload/v1792515347/aravindh-portfolio/epmdiry3qkousxnk7oks.webp",
+      "https://res.cloudinary.com/dlaiic9oi/image/upload/v1792515347/aravindh-portfolio/apulhqhzrrp7pg9j7ngy.webp",
+      "https://res.cloudinary.com/dlaiic9oi/image/upload/v1792515347/aravindh-portfolio/dwthktmhvtqg0jo9ceyh.webp",
+      "https://res.cloudinary.com/dlaiic9oi/image/upload/v1792515349/aravindh-portfolio/pf46dr6j5aytjnobwwqf.webp",
+      "https://res.cloudinary.com/dlaiic9oi/image/upload/v1792515349/aravindh-portfolio/gsvhmiq7dv35dzvv3yy0.webp",
+      "https://res.cloudinary.com/dlaiic9oi/image/upload/v1792515348/aravindh-portfolio/b0rqzsqzzcrtnvgxg5nv.webp",
+      "https://res.cloudinary.com/dlaiic9oi/image/upload/v1792515350/aravindh-portfolio/zoskdupjd0gazqbpjve1.webp",
+      "https://res.cloudinary.com/dlaiic9oi/image/upload/v1792515351/aravindh-portfolio/eo7pvtm2vcdegzc1h0ze.webp"
+    ],
+    "reels": [],
+    "shape": "tall",
+    "id": "9493ff05-83da-46c7-a97b-51d8e1dacd8b",
+    "slug": "siva",
+    "createdAt": "2026-10-20T16:57:03.112Z"
+  },
+  {
+    "id": "default-a-love-quietly-told",
+    "slug": "a-love-quietly-told",
+    "title": "A love, quietly told.",
+    "category": "Weddings",
+    "location": "Chennai",
+    "description": "A celebration of the little glances, the quiet promises, and everything in between.",
+    "shape": "wide",
+    "cover": "/images/a-love-quietly-told.png",
+    "photos": [
+      "/images/a-love-quietly-told.png",
+      "/images/threads-of-gold.png",
+      "/images/the-hands-that-hold.png",
+      "/images/before-the-vows.png"
+    ],
+    "reels": [],
+    "createdAt": "2026-09-28T00:00:00.000Z"
+  },
+  {
+    "id": "default-in-her-own-light",
+    "slug": "in-her-own-light",
+    "title": "In her own light",
+    "category": "Portraits",
+    "location": "Chennai",
+    "description": "A quiet portrait session built around soft afternoon light and unhurried conversation.",
+    "shape": "tall",
+    "cover": "/images/in-her-own-light.png",
+    "photos": [
+      "/images/in-her-own-light.png"
+    ],
+    "reels": [],
+    "createdAt": "2026-09-26T00:00:00.000Z"
+  },
+  {
+    "id": "default-threads-of-gold",
+    "slug": "threads-of-gold",
+    "title": "Threads of gold",
+    "category": "Weddings",
+    "location": "Madurai",
+    "description": "Silk, jasmine and temple stone — a morning wedding told through texture and tradition.",
+    "shape": "arch",
+    "cover": "/images/threads-of-gold.png",
+    "photos": [
+      "/images/threads-of-gold.png",
+      "/images/the-hands-that-hold.png"
+    ],
+    "reels": [],
+    "createdAt": "2026-09-24T00:00:00.000Z"
+  },
+  {
+    "id": "default-the-hands-that-hold",
+    "slug": "the-hands-that-hold",
+    "title": "The hands that hold",
+    "category": "Details",
+    "location": "Kanchipuram",
+    "description": "Bangles, henna and borrowed heirlooms, photographed up close.",
+    "shape": "square",
+    "cover": "/images/the-hands-that-hold.png",
+    "photos": [
+      "/images/the-hands-that-hold.png"
+    ],
+    "reels": [],
+    "createdAt": "2026-09-22T00:00:00.000Z"
+  },
+  {
+    "id": "default-evening-softly",
+    "slug": "evening-softly",
+    "title": "Evening, softly",
+    "category": "Pre-wedding",
+    "location": "Pondicherry",
+    "description": "Two people, a seaside promenade and the last hour of golden light.",
+    "shape": "circle",
+    "cover": "/images/evening-softly.png",
+    "photos": [
+      "/images/evening-softly.png"
+    ],
+    "reels": [],
+    "createdAt": "2026-09-20T00:00:00.000Z"
+  },
+  {
+    "id": "default-beneath-the-marigolds",
+    "slug": "beneath-the-marigolds",
+    "title": "Beneath the marigolds",
+    "category": "Engagement",
+    "location": "Coimbatore",
+    "description": "An intimate engagement under strings of marigold and a lot of laughter.",
+    "shape": "slant",
+    "cover": "/images/beneath-the-marigolds.png",
+    "photos": [
+      "/images/beneath-the-marigolds.png"
+    ],
+    "reels": [],
+    "createdAt": "2026-09-18T00:00:00.000Z"
+  },
+  {
+    "id": "default-before-the-vows",
+    "slug": "before-the-vows",
+    "title": "Before the vows",
+    "category": "Weddings",
+    "location": "Mahabalipuram",
+    "description": "The stillness just before the ceremony begins.",
+    "shape": "pill",
+    "cover": "/images/before-the-vows.png",
+    "photos": [
+      "/images/before-the-vows.png"
+    ],
+    "reels": [],
+    "createdAt": "2026-09-16T00:00:00.000Z"
+  },
+  {
+    "id": "default-little-lanterns",
+    "slug": "little-lanterns",
+    "title": "Little lanterns",
+    "category": "Events",
+    "location": "Chennai",
+    "description": "A festival evening of lamps, music and family, caught candidly.",
+    "shape": "triangle",
+    "cover": "/images/little-lanterns.png",
+    "photos": [
+      "/images/little-lanterns.png"
+    ],
+    "reels": [],
+    "createdAt": "2026-09-14T00:00:00.000Z"
+  },
+  {
+    "id": "default-waiting-for-you",
+    "slug": "waiting-for-you",
+    "title": "Waiting for you",
+    "category": "Maternity",
+    "location": "Chennai",
+    "description": "A gentle maternity story shot at home in warm window light.",
+    "shape": "arch",
+    "cover": "/images/waiting-for-you.png",
+    "photos": [
+      "/images/waiting-for-you.png"
+    ],
+    "reels": [],
+    "createdAt": "2026-09-12T00:00:00.000Z"
+  },
+  {
+    "id": "default-brew-and-brass",
+    "slug": "brew-and-brass",
+    "title": "Brew and brass",
+    "category": "Commercial",
+    "location": "Chennai",
+    "description": "Brand photography for a neighbourhood coffee roaster.",
+    "shape": "wide",
+    "cover": "/images/brew-and-brass.png",
+    "photos": [
+      "/images/brew-and-brass.png"
+    ],
+    "reels": [],
+    "createdAt": "2026-09-10T00:00:00.000Z"
+  },
+  {
+    "id": "default-city-in-silk",
+    "slug": "city-in-silk",
+    "title": "City in silk",
+    "category": "Fashion",
+    "location": "Chennai",
+    "description": "A handloom editorial shot across the old streets of Mylapore.",
+    "shape": "tall",
+    "cover": "/images/city-in-silk.png",
+    "photos": [
+      "/images/city-in-silk.png",
+      "/images/in-her-own-light.png"
+    ],
+    "reels": [],
+    "createdAt": "2026-09-08T00:00:00.000Z"
+  }
+]

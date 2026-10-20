@@ -1,13 +1,23 @@
 import { promises as fs } from 'fs'
 import path from 'path'
-import seedProjects from '@/data/projects.json'
 import { defaultProjects } from './defaultProjects'
 import { db, hasDb } from './db'
 import { SHAPE_VALUES } from './types'
 import type { Project, ProjectInput, Reel, Shape } from './types'
 
 const file = path.join(process.cwd(), 'data', 'projects.json')
-const seed = seedProjects as unknown as Project[]
+
+// Optional one-time seed: data/projects.json may be missing on the server (it is
+// usually git-ignored), so it is read at runtime instead of imported at build time.
+async function loadSeed(): Promise<Project[]> {
+  try {
+    const list = JSON.parse(await fs.readFile(file, 'utf8')) as Project[]
+    if (Array.isArray(list) && list.length) return list
+  } catch {
+    // file not present on the server - fall through
+  }
+  return defaultProjects
+}
 
 /* ---------- placeholder clean-up (unchanged behaviour) ---------- */
 
@@ -74,6 +84,7 @@ async function client() {
   const seeded = await c.execute({ sql: 'SELECT value FROM meta WHERE key = ?', args: ['projects-seeded'] })
   if (!seeded.rows.length) {
     const count = await c.execute('SELECT COUNT(*) AS n FROM projects')
+    const seed = await loadSeed()
     if (Number((count.rows[0] as unknown as Row).n) === 0 && seed.length) {
       await c.batch(
         seed.map((p) => ({ sql: insertSql, args: insertArgs(p) })),
@@ -104,7 +115,7 @@ async function readFileList(): Promise<Project[]> {
     await ensure()
     return JSON.parse(await fs.readFile(file, 'utf8')) as Project[]
   } catch {
-    return seed.length ? seed : defaultProjects
+    return defaultProjects
   }
 }
 
@@ -129,7 +140,7 @@ export async function getProjects(): Promise<Project[]> {
       return normalize(res.rows.map((r) => toProject(r as unknown as Row)))
     } catch (err) {
       console.error('[store] getProjects failed', err)
-      return normalize(seed.length ? seed : defaultProjects)
+      return normalize(await loadSeed())
     }
   }
   return normalize(await readFileList())
