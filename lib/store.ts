@@ -1,10 +1,94 @@
 import { promises as fs } from 'fs'
 import path from 'path'
+import seedProjects from '@/data/projects.json'
 import { defaultProjects } from './defaultProjects'
+import { db, hasDb } from './db'
 import { SHAPE_VALUES } from './types'
 import type { Project, ProjectInput, Reel, Shape } from './types'
 
 const file = path.join(process.cwd(), 'data', 'projects.json')
+const seed = seedProjects as unknown as Project[]
+
+/* ---------- placeholder clean-up (unchanged behaviour) ---------- */
+
+function normalize(list: Project[]): Project[] {
+  return list.map((project) => {
+    const sample = defaultProjects.find((p) => p.id === project.id)
+    if (!sample) return project
+    const placeholder = (url: string) => /^https:\/\/(?:fastly\.)?picsum\.photos\//.test(url)
+    return {
+      ...project,
+      cover: placeholder(project.cover) ? sample.cover : project.cover,
+      photos: project.photos.some(placeholder)
+        ? [...sample.photos, ...project.photos.filter((url) => !placeholder(url))]
+        : project.photos,
+      reels: project.reels.filter(
+        (reel) =>
+          !/^https:\/\/res\.cloudinary\.com\/demo\/video\/upload\/(dog|elephants|sea-turtle)\.mp4$/.test(
+            reel.src
+          )
+      )
+    }
+  })
+}
+
+/* ---------- Turso / libSQL (production) ---------- */
+
+type Row = Record<string, unknown>
+
+const toProject = (r: Row): Project => ({
+  id: String(r.id),
+  slug: String(r.slug),
+  title: String(r.title),
+  category: String(r.category ?? ''),
+  location: String(r.location ?? ''),
+  description: String(r.description ?? ''),
+  cover: String(r.cover),
+  photos: JSON.parse(String(r.photos || '[]')),
+  reels: JSON.parse(String(r.reels || '[]')),
+  shape: String(r.shape || 'tall') as Shape,
+  createdAt: String(r.created_at)
+})
+
+const insertSql = `INSERT OR IGNORE INTO projects
+  (id, slug, title, category, location, description, cover, photos, reels, shape, created_at)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+
+const insertArgs = (p: Project) => [
+  p.id,
+  p.slug,
+  p.title,
+  p.category,
+  p.location,
+  p.description,
+  p.cover,
+  JSON.stringify(p.photos),
+  JSON.stringify(p.reels),
+  p.shape,
+  p.createdAt
+]
+
+async function client() {
+  const c = await db()
+  // First run only: copy the projects already in data/projects.json into Turso.
+  const seeded = await c.execute({ sql: 'SELECT value FROM meta WHERE key = ?', args: ['projects-seeded'] })
+  if (!seeded.rows.length) {
+    const count = await c.execute('SELECT COUNT(*) AS n FROM projects')
+    if (Number((count.rows[0] as unknown as Row).n) === 0 && seed.length) {
+      await c.batch(
+        seed.map((p) => ({ sql: insertSql, args: insertArgs(p) })),
+        'write'
+      )
+    }
+    await c.execute({
+      sql: 'INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)',
+      args: ['projects-seeded', new Date().toISOString()]
+    })
+  }
+  return c
+}
+
+/* ---------- local file fallback (dev only, when TURSO_DATABASE_URL is missing) ---------- */
 
 async function ensure() {
   try {
@@ -15,31 +99,40 @@ async function ensure() {
   }
 }
 
-async function save(list: Project[]) {
-  await ensure()
-  await fs.writeFile(file, JSON.stringify(list, null, 2))
-}
-
-export async function getProjects(): Promise<Project[]> {
+async function readFileList(): Promise<Project[]> {
   try {
     await ensure()
-    const list = JSON.parse(await fs.readFile(file, 'utf8')) as Project[]
-    return list.map((project) => {
-      const sample = defaultProjects.find((p) => p.id === project.id)
-      if (!sample) return project
-      const placeholder = (url: string) => /^https:\/\/(?:fastly\.)?picsum\.photos\//.test(url)
-      return {
-        ...project,
-        cover: placeholder(project.cover) ? sample.cover : project.cover,
-        photos: project.photos.some(placeholder)
-          ? [...sample.photos, ...project.photos.filter((url) => !placeholder(url))]
-          : project.photos,
-        reels: project.reels.filter((reel) => !/^https:\/\/res\.cloudinary\.com\/demo\/video\/upload\/(dog|elephants|sea-turtle)\.mp4$/.test(reel.src))
-      }
-    })
+    return JSON.parse(await fs.readFile(file, 'utf8')) as Project[]
   } catch {
-    return defaultProjects
+    return seed.length ? seed : defaultProjects
   }
+}
+
+async function saveFileList(list: Project[]) {
+  try {
+    await ensure()
+    await fs.writeFile(file, JSON.stringify(list, null, 2))
+  } catch {
+    throw new Error(
+      'Server storage is read-only. Add TURSO_DATABASE_URL and TURSO_AUTH_TOKEN to your environment variables to enable saving.'
+    )
+  }
+}
+
+/* ---------- public API ---------- */
+
+export async function getProjects(): Promise<Project[]> {
+  if (hasDb()) {
+    try {
+      const c = await client()
+      const res = await c.execute('SELECT * FROM projects ORDER BY created_at DESC')
+      return normalize(res.rows.map((r) => toProject(r as unknown as Row)))
+    } catch (err) {
+      console.error('[store] getProjects failed', err)
+      return normalize(seed.length ? seed : defaultProjects)
+    }
+  }
+  return normalize(await readFileList())
 }
 
 export async function getProject(slug: string) {
@@ -102,24 +195,56 @@ export async function createProject(input: ProjectInput) {
     slug,
     createdAt: new Date().toISOString()
   }
-  await save([project, ...list])
+  if (hasDb()) {
+    const c = await client()
+    await c.execute({ sql: insertSql.replace('INSERT OR IGNORE', 'INSERT'), args: insertArgs(project) })
+  } else {
+    await saveFileList([project, ...list])
+  }
   return project
 }
 
 export async function updateProject(id: string, input: ProjectInput) {
-  const list = await getProjects()
+  if (hasDb()) {
+    const c = await client()
+    const found = await c.execute({ sql: 'SELECT * FROM projects WHERE id = ?', args: [id] })
+    if (!found.rows.length) return null
+    const next: Project = { ...toProject(found.rows[0] as unknown as Row), ...input }
+    await c.execute({
+      sql: `UPDATE projects SET title = ?, category = ?, location = ?, description = ?,
+            cover = ?, photos = ?, reels = ?, shape = ? WHERE id = ?`,
+      args: [
+        next.title,
+        next.category,
+        next.location,
+        next.description,
+        next.cover,
+        JSON.stringify(next.photos),
+        JSON.stringify(next.reels),
+        next.shape,
+        id
+      ]
+    })
+    return next
+  }
+  const list = await readFileList()
   const idx = list.findIndex((p) => p.id === id)
   if (idx === -1) return null
   const next = { ...list[idx], ...input }
   list[idx] = next
-  await save(list)
+  await saveFileList(list)
   return next
 }
 
 export async function deleteProject(id: string) {
-  const list = await getProjects()
+  if (hasDb()) {
+    const c = await client()
+    const res = await c.execute({ sql: 'DELETE FROM projects WHERE id = ?', args: [id] })
+    return res.rowsAffected > 0
+  }
+  const list = await readFileList()
   const next = list.filter((p) => p.id !== id)
   if (next.length === list.length) return false
-  await save(next)
+  await saveFileList(next)
   return true
 }

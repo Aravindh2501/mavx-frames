@@ -22,9 +22,10 @@ export async function PUT(req: Request, { params }: Ctx) {
     const project = await updateProject(id, input)
     if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 })
     return NextResponse.json(project)
-  } catch {
+  } catch (err) {
+    console.error('[projects] save failed', err)
     return NextResponse.json(
-      { error: 'Could not save. The server storage is read-only.' },
+      { error: `Could not save: ${(err as Error).message}` },
       { status: 500 }
     )
   }
@@ -39,9 +40,10 @@ export async function DELETE(req: Request, { params }: Ctx) {
     const ok = await deleteProject(id)
     if (!ok) return NextResponse.json({ error: 'Not found' }, { status: 404 })
     return NextResponse.json({ ok: true })
-  } catch {
+  } catch (err) {
+    console.error('[projects] delete failed', err)
     return NextResponse.json(
-      { error: 'Could not delete. The server storage is read-only.' },
+      { error: `Could not delete: ${(err as Error).message}` },
       { status: 500 }
     )
   }

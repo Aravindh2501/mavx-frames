@@ -21,9 +21,10 @@ export async function POST(req: Request) {
   }
   try {
     return NextResponse.json(await createProject(input), { status: 201 })
-  } catch {
+  } catch (err) {
+    console.error('[projects] save failed', err)
     return NextResponse.json(
-      { error: 'Could not save. The server storage is read-only.' },
+      { error: `Could not save: ${(err as Error).message}` },
       { status: 500 }
     )
   }
