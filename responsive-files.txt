@@ -1,0 +1,1413 @@
+]633;E;for f in app/globals.css tailwind.config.ts tailwind.config.js app/layout.tsx app/page.tsx app/work/page.tsx "app/work/[slug]/page.tsx" components/Hero.tsx components/Logo.tsx components/ThemeToggle.tsx components/Photo.tsx components/ContactButton.tsx components/ContactModal.tsx components/UIProvider.tsx lib/seo.ts lib/site.ts\x3b do [ -f "$f" ] && { echo "=== $f ==="\x3b cat "$f"\x3b echo\x3b }\x3b done > responsive-files.txt;984c7011-af16-47c4-a320-da5f2ea3b07e]633;C=== app/globals.css ===
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper: 243 234 229;
+  --ink: 9 9 9;
+  --mute: 104 88 93;
+  --line: 216 197 197;
+  --accent: 116 29 55;
+  --burgundy: 100 30 50;
+  color-scheme: light;
+}
+:root.dark {
+  --paper: 9 9 9;
+  --ink: 243 234 229;
+  --mute: 185 161 169;
+  --line: 53 34 41;
+  /* Lift the text accent for contrast; deep burgundy remains the brand surface. */
+  --accent: 211 139 162;
+  --burgundy: 100 30 50;
+  color-scheme: dark;
+}
+
+html {
+  background: rgb(var(--paper));
+}
+
+body,
+.theme-fade {
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+body {
+  @apply bg-paper font-sans text-ink antialiased;
+  overflow-x: clip;
+}
+
+::selection {
+  background: rgb(var(--burgundy));
+  color: #F3EAE5;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@layer components {
+  .field {
+    @apply w-full rounded-md border border-line bg-paper px-3 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-mute/70 focus:border-ink;
+  }
+
+  .label {
+    @apply mb-1.5 block text-[11px] text-mute;
+  }
+
+  .eyebrow {
+    @apply text-[10px] uppercase tracking-[0.22em] text-mute;
+  }
+
+  .btn-solid,
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 bg-transparent py-2 text-sm font-medium text-ink transition-colors hover:text-accent disabled:cursor-not-allowed disabled:opacity-50;
+    border: 0;
+    border-radius: 0;
+  }
+
+}
+
+@keyframes tick {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.tick-fill {
+  transform-origin: left center;
+  animation: tick var(--tick-ms, 5500ms) linear forwards;
+}
+
+/* ------------------------------------------------------------------
+   Navbar — minimal, premium
+------------------------------------------------------------------- */
+.site-nav {
+  color: rgb(var(--ink));
+  transition: color 0.5s ease;
+}
+
+.site-nav::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgb(var(--paper) / 0.78);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+  border-bottom: 1px solid rgb(var(--line) / 0.9);
+  opacity: 0;
+  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.site-nav[data-scrolled='true']::before {
+  opacity: 1;
+}
+
+.site-nav[data-over-image='true'] {
+  color: #fff;
+}
+
+.site-nav-bar {
+  height: 4.25rem;
+  transition: height 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.site-nav[data-scrolled='true'] .site-nav-bar {
+  height: 3.6rem;
+}
+
+/* Entrance — pure CSS so items can never get stuck hidden */
+@keyframes nav-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.nav-in {
+  animation: nav-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms + 150ms);
+}
+
+.nav-link {
+  position: relative;
+  padding: 0.35rem 0;
+  opacity: 0.78;
+  transition: opacity 0.3s ease;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-link:hover,
+.nav-link[data-active='true'] {
+  opacity: 1;
+}
+
+.nav-link:hover::after,
+.nav-link[data-active='true']::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.nav-cta {
+  display: inline-flex;
+  align-items: center;
+  padding: .35rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  white-space: nowrap;
+  opacity: .78;
+  transition: opacity .3s ease;
+}
+.nav-cta:hover { opacity: 1; }
+
+.nav-icon-btn {
+  display: inline-flex;
+  height: 2rem;
+  width: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  opacity: 0.8;
+  transition: opacity 0.3s ease, background-color 0.3s ease;
+}
+
+.nav-icon-btn:hover {
+  opacity: 1;
+  background: rgb(127 127 127 / 0.16);
+}
+
+.nav-divider {
+  border-left: 1px solid rgb(127 127 127 / 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-in {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Smoothness helpers
+------------------------------------------------------------------- */
+.gpu {
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Editorial hierarchy: display, section, project and body have distinct scales. */
+h1, h2, h3 { font-family: 'Manrope', sans-serif; font-weight: 500; }
+h2 { letter-spacing: -.055em; }
+p { text-wrap: pretty; }
+button:focus-visible, a:focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 6px; }
+.work-tab { padding: .75rem 1rem; border: 0; background: transparent; border-radius: 0; }
+.focus-card { width: 42vw; }
+.focus-card:nth-child(even) { width: 30vw; }
+.focus-media { height: clamp(200px, 46svh, 540px); }
+.focus-card:nth-child(even) .focus-media { height: clamp(240px, 54svh, 640px); }
+.focus-track { gap: 16vw; padding-inline: 6vw; }
+@media (max-width: 767px) {
+  .focus-card, .focus-card:nth-child(even) { width: 78vw; }
+  .focus-track { gap: 9vw; }
+  .focus-media { height: 44svh; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* Flow-based hero: the lower photo always follows the title and description. */
+.home-hero-grid { display: grid; gap: 2.5rem; }
+.home-hero-copy { position: relative; z-index: 1; min-width: 0; }
+.home-hero-media { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+.home-hero-portrait { grid-column: 1 / -1; }
+@media (min-width: 768px) {
+  .home-hero-grid {
+    grid-template-columns: minmax(0,44fr) minmax(0,29fr) minmax(0,21fr);
+    column-gap: 3%;
+    row-gap: 3rem;
+    align-items: start;
+  }
+  .home-hero-copy { grid-column: 1; grid-row: 1; padding-top: 1.5rem; }
+  .home-hero-media { display: contents; }
+  .home-hero-portrait { grid-column: 2; grid-row: 1 / 3; }
+  .home-hero-small { grid-column: 3; grid-row: 1; margin-top: 1.5rem; }
+  .home-hero-wide { grid-column: 1; grid-row: 2; }
+}
+/* The fixed navbar overlays this full-viewport slide; it does not subtract height. */
+.work-landing { height: 100vh; height: 100dvh; }
+/* Satin highlights use wine tones; the underlying brand remains #641E32. */
+h1 .text-accent, h2 .text-accent, h3 .text-accent {
+  color: #741d37;
+  background: linear-gradient(115deg, #4b1024 4%, #8e3451 42%, #ad5770 52%, #641e32 74%, #4b1024 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.dark h1 .text-accent, .dark h2 .text-accent, .dark h3 .text-accent {
+  color: #d38ba2;
+  background-image: linear-gradient(115deg, #c87996 0%, #ecc2cf 46%, #d38ba2 62%, #ba6c87 100%);
+}
+.portfolio-quote {
+  color: #F3EAE5;
+  background: radial-gradient(ellipse at 24% 0%, #a9546b66, transparent 60%), linear-gradient(120deg, #38101e, #641E32 45%, #491126);
+  box-shadow: inset 0 1px 0 #f3eae533, 0 24px 60px -36px #641e3280;
+}
+.portfolio-quote::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(155deg, transparent 20%, #f3eae50c 45%, transparent 60%);
+}
+.dark .portfolio-quote {
+  background: radial-gradient(ellipse at 26% 0%, #ad59724d, transparent 65%), linear-gradient(120deg, #270b16, #641E32 48%, #330c1c);
+  box-shadow: inset 0 1px 0 #f3eae529, 0 24px 70px -35px #641e3266;
+}
+@media (forced-colors: active) {
+  h1 .text-accent, h2 .text-accent, h3 .text-accent { -webkit-text-fill-color: currentColor; background: none; }
+}
+
+
+/* ------------------------------------------------------------------
+   MAV X Frames Logo
+------------------------------------------------------------------- */
+
+.brand-logo {
+  display: block;
+  width: var(--logo-width, 240px);
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  transition: opacity 0.3s ease;
+}
+
+/* Explicit theme variants */
+.logo-light {
+  color-scheme: light;
+}
+
+.logo-dark {
+  color-scheme: dark;
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .brand-logo {
+    transition: none;
+  }
+}
+
+=== tailwind.config.js ===
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  darkMode: ['class', '.dark'],
+  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        paper: 'rgb(var(--paper) / <alpha-value>)',
+        ink: 'rgb(var(--ink) / <alpha-value>)',
+        mute: 'rgb(var(--mute) / <alpha-value>)',
+        line: 'rgb(var(--line) / <alpha-value>)',
+        accent: 'rgb(var(--accent) / <alpha-value>)'
+      },
+      fontFamily: {
+        serif: ['Manrope', 'sans-serif'],
+        sans: ['DM Sans', 'system-ui', 'sans-serif']
+      }
+    }
+  },
+  plugins: []
+}
+
+=== app/layout.tsx ===
+import { Suspense } from 'react'
+import type { Metadata } from 'next'
+import './globals.css'
+import UIProvider from '@/components/UIProvider'
+import Navbar from '@/components/Navbar'
+import SmoothScroll from '@/components/SmoothScroll'
+import JsonLd from '@/components/JsonLd'
+import { BRAND, CITIES, SITE_URL, cityPath } from '@/lib/seo'
+import { site } from '@/lib/site'
+
+const TITLE = 'MAVX Frames — Wedding & Pre-Wedding Photographer in Chennai, Tamil Nadu'
+
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  title: { default: TITLE, template: '%s | MAVX Frames' },
+  description: BRAND.description,
+  applicationName: BRAND.name,
+  keywords: [
+    'wedding photographer in Chennai',
+    'pre wedding photographer Chennai',
+    'candid wedding photography Tamil Nadu',
+    'wedding photographer Coimbatore',
+    'wedding photographer Madurai',
+    'wedding photographer Trichy',
+    'wedding photographer Thanjavur',
+    'wedding photographer Pondicherry',
+    'wedding photographer Vellore',
+    'wedding photographer Cuddalore',
+    'photographer Chennai'
+  ],
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    locale: 'en_IN',
+    url: '/',
+    siteName: BRAND.name,
+    title: TITLE,
+    description: BRAND.description,
+    images: [{ url: BRAND.ogImage, alt: 'MAVX Frames wedding photography in Chennai' }]
+  },
+  twitter: { card: 'summary_large_image', title: TITLE, description: BRAND.description, images: [BRAND.ogImage] },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 } },
+  other: {
+    'geo.region': 'IN-TN',
+    'geo.placename': 'Chennai',
+    'geo.position': `${BRAND.geo.lat};${BRAND.geo.lng}`,
+    ICBM: `${BRAND.geo.lat}, ${BRAND.geo.lng}`
+  }
+}
+
+const businessJsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': ['ProfessionalService', 'LocalBusiness'],
+    '@id': `${SITE_URL}/#business`,
+    name: BRAND.name,
+    url: SITE_URL,
+    description: BRAND.description,
+    image: `${SITE_URL}${BRAND.ogImage}`,
+    priceRange: '₹₹',
+    address: { '@type': 'PostalAddress', addressLocality: 'Chennai', addressRegion: 'Tamil Nadu', addressCountry: 'IN' },
+    geo: { '@type': 'GeoCoordinates', latitude: BRAND.geo.lat, longitude: BRAND.geo.lng },
+    areaServed: CITIES.map((c) => ({ '@type': 'City', name: c.name.split(' (')[0], url: `${SITE_URL}${cityPath(c.slug)}` })),
+    knowsAbout: ['Wedding photography', 'Pre-wedding photography', 'Portrait photography', 'Event photography'],
+    sameAs: [site.instagram, site.youtube].filter(Boolean)
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${SITE_URL}/#website`,
+    url: SITE_URL,
+    name: BRAND.name,
+    inLanguage: 'en-IN',
+    publisher: { '@id': `${SITE_URL}/#business` }
+  }
+]
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en-IN" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.classList.toggle('dark',t==='dark')}catch(e){}})()"
+          }}
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap"
+        />
+      </head>
+      <body>
+        <JsonLd data={businessJsonLd} />
+        <Suspense fallback={null}>
+          <UIProvider>
+            <SmoothScroll />
+            <Navbar />
+            {children}
+          </UIProvider>
+        </Suspense>
+      </body>
+    </html>
+  )
+}
+
+=== app/page.tsx ===
+import Hero from '@/components/Hero'
+import InFocus from '@/components/InFocus'
+import About from '@/components/About'
+import Footer from '@/components/Footer'
+import Locations from '@/components/Locations'
+import { getProjects } from '@/lib/store'
+
+export const dynamic = 'force-dynamic'
+
+export default async function Home() {
+  const projects = await getProjects()
+  const first = projects[0]
+  const images = {
+    wide: first?.cover ?? '',
+    portrait: (projects[1] ?? first)?.cover ?? '',
+    small: (projects[2] ?? first)?.cover ?? ''
+  }
+
+  return (
+    <main>
+      <Hero images={images} />
+      <InFocus projects={projects} />
+      <About />
+      <section aria-label="Our philosophy" className="mx-auto max-w-[1280px] px-6 pb-24 md:px-10 md:pb-36">
+        <figure className="portfolio-quote relative isolate overflow-hidden px-8 py-16 text-center md:px-20 md:py-24">
+          <blockquote className="relative mx-auto max-w-[20ch] font-serif text-[clamp(2rem,4.5vw,4.5rem)] font-medium leading-[1.15] tracking-[-0.045em]">
+            Some moments pass.<br />The feeling stays.
+          </blockquote>
+          <figcaption className="relative mt-9 text-xs tracking-[0.14em] text-[#F3EAE5]/75">MAVX Frames</figcaption>
+        </figure>
+      </section>
+      <Locations />
+      <Footer variant="home" />
+    </main>
+  )
+}
+
+=== app/work/page.tsx ===
+import { Suspense } from 'react'
+import WorkHero from '@/components/WorkHero'
+import WorkGallery from '@/components/WorkGallery'
+import Footer from '@/components/Footer'
+import { getProjects } from '@/lib/store'
+
+export const dynamic = 'force-dynamic'
+
+export const metadata = {
+  title: 'Wedding & Pre-Wedding Photography Portfolio',
+  description:
+    'Browse wedding, pre-wedding, portrait and commercial photography stories by MAVX Frames, a Chennai photographer who travels across Tamil Nadu.',
+  alternates: { canonical: '/work' }
+}
+
+export default async function WorkPage() {
+  const projects = await getProjects()
+
+  return (
+    <main>
+      <WorkHero slides={projects.slice(0, 6)} />
+      <Suspense fallback={null}>
+        <WorkGallery projects={projects} />
+      </Suspense>
+      <Footer variant="home" />
+    </main>
+  )
+}
+
+=== app/work/[slug]/page.tsx ===
+import { notFound } from 'next/navigation'
+import ProjectDetail from '@/components/ProjectDetail'
+import JsonLd from '@/components/JsonLd'
+import { SITE_URL } from '@/lib/seo'
+import { getProject, getProjects } from '@/lib/store'
+
+export const dynamic = 'force-dynamic'
+
+type Props = { params: Promise<{ slug: string }> }
+
+export async function generateMetadata({ params }: Props) {
+  const { slug } = await params
+  const project = await getProject(slug)
+  if (!project) return { title: 'Not found', robots: { index: false } }
+  const where = project.location ? ` in ${project.location}` : ''
+  const description =
+    project.description ||
+    `${project.title}: a ${project.category.toLowerCase()} photography story${where} by MAVX Frames, Chennai.`
+  return {
+    title: `${project.title} — ${project.category} Photography${where}`,
+    description,
+    alternates: { canonical: `/work/${project.slug}` },
+    openGraph: { type: 'article', title: project.title, description, images: project.cover ? [{ url: project.cover, alt: project.title }] : undefined },
+    twitter: { card: 'summary_large_image', title: project.title, description, images: project.cover ? [project.cover] : undefined }
+  }
+}
+
+export default async function ProjectPage({ params }: Props) {
+  const { slug } = await params
+  const projects = await getProjects()
+  const index = projects.findIndex((p) => p.slug === slug)
+  if (index === -1) notFound()
+  const project = projects[index]
+  const next = projects.length > 1 ? projects[(index + 1) % projects.length] : null
+
+  return (
+    <main>
+      <JsonLd
+        data={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'ImageGallery',
+            name: project.title,
+            description: project.description || undefined,
+            url: `${SITE_URL}/work/${project.slug}`,
+            contentLocation: project.location || undefined,
+            image: [project.cover, ...(project.photos || [])].filter(Boolean).slice(0, 12),
+            author: { '@id': `${SITE_URL}/#business` }
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+              { '@type': 'ListItem', position: 2, name: 'Work', item: `${SITE_URL}/work` },
+              { '@type': 'ListItem', position: 3, name: project.title, item: `${SITE_URL}/work/${project.slug}` }
+            ]
+          }
+        ]}
+      />
+      <ProjectDetail project={project} next={next} />
+    </main>
+  )
+}
+
+=== components/Hero.tsx ===
+'use client'
+
+import { useRef } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
+import Photo from './Photo'
+
+gsap.registerPlugin(useGSAP, ScrollTrigger)
+
+interface Props {
+  images: { wide: string; portrait: string; small: string }
+}
+
+export default function Hero({ images }: Props) {
+  const root = useRef<HTMLElement>(null)
+
+  useGSAP(
+    () => {
+      const tl = gsap.timeline({ defaults: { ease: 'power4.out' } })
+      tl.from('.hero-line', { yPercent: 118, duration: 1.3, stagger: 0.14 }, 0.15)
+        .from('.hero-sub', { autoAlpha: 0, y: 22, duration: 1 }, 1.05)
+        .fromTo(
+          '.hero-frame',
+          { clipPath: 'inset(100% 0% 0% 0%)' },
+          { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.6, stagger: 0.18, ease: 'expo.out' },
+          0.2
+        )
+        .from('.hero-frame img', { scale: 1.35, duration: 2.2, stagger: 0.18, ease: 'expo.out' }, 0.2)
+
+
+    },
+    { scope: root }
+  )
+
+  return (
+    <section ref={root} className="relative pt-28 md:pt-32">
+      <div className="mx-auto max-w-[1280px] px-6 md:px-10">
+        <div className="home-hero-grid">
+          <div className="home-hero-copy">
+            <h1 className="font-serif text-[clamp(3.2rem,7.2vw,6.5rem)] leading-[1.02] tracking-[-0.07em]">
+              <span className="sr-only">MAVX Frames — wedding and event photographer in Chennai, travelling across Tamil Nadu. </span>
+              <span className="block overflow-hidden py-[0.06em]">
+                <span className="hero-line block">The art</span>
+              </span>
+              <span className="block overflow-hidden py-[0.02em]">
+                <span className="hero-line block">of</span>
+              </span>
+              <span className="block overflow-hidden py-[0.06em]">
+                <span className="hero-line block text-accent">noticing.</span>
+              </span>
+            </h1>
+            
+            {/* <p className="hero-sub mt-5 max-w-[19rem] font-sans text-base leading-relaxed text-ink/80">
+              Weddings, people and the quiet moments that make them unforgettable.
+            </p> */}
+          </div>
+
+          <div className="home-hero-media">
+            <div className="home-hero-portrait">
+              <div className="hero-frame relative aspect-[4/5] overflow-hidden shadow-[0_24px_60px_-24px_rgba(20,18,17,0.35)] md:aspect-[0.55]">
+                <Photo src={images.portrait} alt="Wedding portrait by MAVX Frames, photographer in Chennai" priority sizes="(min-width:768px) 28vw, 100vw" className="object-cover" />
+              </div>
+            </div>
+            <div className="home-hero-small">
+              <div className="hero-frame relative aspect-[4/3] overflow-hidden shadow-[0_24px_60px_-24px_rgba(20,18,17,0.35)] md:aspect-[1.4]">
+                <Photo src={images.small} alt="Candid wedding moment photographed by MAVX Frames in Tamil Nadu" priority sizes="(min-width:768px) 23vw, 50vw" className="object-cover" />
+              </div>
+            </div>
+            <div className="home-hero-wide">
+              <div className="hero-frame relative aspect-[4/3] overflow-hidden shadow-[0_24px_60px_-24px_rgba(20,18,17,0.35)] md:aspect-[2.5]">
+                <Photo src={images.wide} alt="Wedding photography in Chennai and Coimbatore by MAVX Frames" priority sizes="(min-width:768px) 40vw, 50vw" className="object-cover" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+=== components/Logo.tsx ===
+
+import Image from "next/image";
+import type { CSSProperties } from "react";
+
+type LogoProps = {
+  className?: string;
+  width?: number;
+  height?: number;
+  priority?: boolean;
+  theme?: "light" | "dark" | "inherit";
+};
+
+export default function Logo({
+  className = "",
+  width = 240,
+  height = 78,
+  priority = false,
+  theme = "inherit",
+}: LogoProps) {
+  const themeClass =
+    theme === "light"
+      ? "logo-light"
+      : theme === "dark"
+        ? "logo-dark"
+        : "";
+
+  return (
+    <Image
+      src="/logo.svg"
+      alt="MAV X Frames"
+      width={width}
+      height={height}
+      priority={priority}
+      className={`brand-logo ${themeClass} ${className}`.trim()}
+      style={
+        {
+          "--logo-width": `${width}px`,
+          "--logo-height": `${height}px`,
+        } as CSSProperties
+      }
+    />
+  );
+}
+
+=== components/ThemeToggle.tsx ===
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
+import gsap from 'gsap'
+import { MoonIcon, SunIcon } from './Icons'
+
+export default function ThemeToggle() {
+  const [dark, setDark] = useState(false)
+  const icon = useRef<HTMLSpanElement>(null)
+
+  useEffect(() => {
+    setDark(document.documentElement.classList.contains('dark'))
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    const sync = () => {
+      let saved: string | null = null
+      try { saved = localStorage.getItem('theme') } catch {}
+      const next = saved ? saved === 'dark' : media.matches
+      document.documentElement.classList.toggle('dark', next)
+      setDark(next)
+    }
+    media.addEventListener('change', sync)
+    window.addEventListener('storage', sync)
+    return () => { media.removeEventListener('change', sync); window.removeEventListener('storage', sync) }
+  }, [])
+
+  const toggle = () => {
+    const next = !dark
+    document.documentElement.classList.toggle('dark', next)
+    try {
+      localStorage.setItem('theme', next ? 'dark' : 'light')
+    } catch {}
+    setDark(next)
+    if (icon.current && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      gsap.fromTo(
+        icon.current,
+        { rotate: -70, scale: 0.6, opacity: 0 },
+        { rotate: 0, scale: 1, opacity: 1, duration: 0.6, ease: 'power3.out', clearProps: 'all' }
+      )
+    }
+  }
+
+  return (
+    <button
+      onClick={toggle}
+      aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+      title={dark ? 'Light mode' : 'Dark mode'}
+      className="nav-icon-btn"
+    >
+      <span ref={icon} className="flex">
+        {dark ? <SunIcon width={17} height={17} /> : <MoonIcon width={17} height={17} />}
+      </span>
+    </button>
+  )
+}
+
+=== components/Photo.tsx ===
+'use client'
+
+import Image from 'next/image'
+import { cloudinaryLoader, isCloudinary } from '@/lib/cloudinary'
+
+interface Props {
+  src: string
+  alt: string
+  sizes?: string
+  priority?: boolean
+  className?: string
+}
+
+export default function Photo({ src, alt, sizes = '100vw', priority, className }: Props) {
+  const safeSrc = src || '/images/a-love-quietly-told.png'
+  const cld = isCloudinary(safeSrc)
+  return (
+    <Image
+      src={safeSrc}
+      alt={alt}
+      fill
+      sizes={sizes}
+      priority={priority}
+      className={className}
+      loader={cld ? cloudinaryLoader : undefined}
+      unoptimized={!cld && !safeSrc.startsWith('/')}
+      draggable={false}
+    />
+  )
+}
+
+=== components/ContactButton.tsx ===
+'use client'
+
+import { useUI } from './UIProvider'
+
+export default function ContactButton({ label, className = 'btn-solid' }: { label: string; className?: string }) {
+  const { openContact } = useUI()
+  return (
+    <button onClick={openContact} className={className}>
+      {label}
+    </button>
+  )
+}
+
+=== components/ContactModal.tsx ===
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
+import { CloseIcon } from './Icons'
+import { site } from '@/lib/site'
+
+gsap.registerPlugin(useGSAP)
+
+type Status = 'idle' | 'sending' | 'done' | 'error'
+
+export default function ContactModal({
+  open,
+  onClose
+}: {
+  open: boolean
+  onClose: () => void
+}) {
+  const panel = useRef<HTMLDivElement>(null)
+  const [form, setForm] = useState({ name: '', contact: '', type: '', message: '' })
+  const [status, setStatus] = useState<Status>('idle')
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open, onClose])
+
+  useGSAP(
+    () => {
+      if (open && panel.current) {
+        gsap.fromTo(
+          panel.current,
+          { y: 40, autoAlpha: 0, scale: 0.98 },
+          { y: 0, autoAlpha: 1, scale: 1, duration: 0.6, ease: 'power3.out' }
+        )
+      }
+    },
+    { dependencies: [open] }
+  )
+
+  if (!open) return null
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setStatus('sending')
+    setError('')
+    try {
+      const res = await fetch('/api/enquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error ?? 'Something went wrong')
+      }
+      setStatus('done')
+      setForm({ name: '', contact: '', type: '', message: '' })
+    } catch (err) {
+      setError((err as Error).message)
+      setStatus('error')
+    }
+  }
+
+  const close = () => {
+    setStatus('idle')
+    onClose()
+  }
+
+  return (
+    <div
+      data-lenis-prevent
+      className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm"
+      onMouseDown={(e) => e.target === e.currentTarget && close()}
+    >
+      <div
+        ref={panel}
+        className="grid w-full max-w-3xl overflow-hidden rounded-lg bg-paper shadow-2xl md:grid-cols-[0.9fr_1.1fr]"
+      >
+        <div className="relative hidden min-h-[420px] md:block">
+          <img
+            src={site.contactImage}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </div>
+        <div className="relative p-7 md:p-9">
+          <button
+            onClick={close}
+            aria-label="Close"
+            className="absolute right-4 top-4 text-mute transition-colors hover:text-ink"
+          >
+            <CloseIcon />
+          </button>
+
+          {status === 'done' ? (
+            <div className="flex h-full min-h-[320px] flex-col justify-center">
+              <h2 className="font-serif text-3xl">Thank you.</h2>
+              <p className="mt-3 text-sm text-mute">
+                Your note has reached me. I’ll get back to you very soon.
+              </p>
+              <button onClick={close} className="btn-ghost mt-6 self-start">
+                Close
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={submit} className="flex flex-col gap-3">
+              <h2 className="font-serif text-3xl leading-tight">Let’s make something real.</h2>
+              <p className="mb-2 text-xs text-mute">
+                Tell me a bit about your plans and I’ll get back to you soon.
+              </p>
+              <input
+                required
+                className="field"
+                placeholder="Your name"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+              <input
+                required
+                className="field"
+                placeholder="Email or phone"
+                value={form.contact}
+                onChange={(e) => setForm({ ...form, contact: e.target.value })}
+              />
+              <select
+                className="field"
+                value={form.type}
+                onChange={(e) => setForm({ ...form, type: e.target.value })}
+              >
+                <option value="">Shoot type</option>
+                {site.shootTypes.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+              <textarea
+                className="field min-h-[110px] resize-y"
+                placeholder="Tell me about your idea"
+                value={form.message}
+                onChange={(e) => setForm({ ...form, message: e.target.value })}
+              />
+              {error && <p className="text-xs text-accent">{error}</p>}
+              <button type="submit" disabled={status === 'sending'} className="btn-solid self-start">
+                {status === 'sending' ? 'Sending…' : 'Send enquiry'}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+=== components/UIProvider.tsx ===
+'use client'
+
+import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import ContactModal from './ContactModal'
+import ProjectModal from './ProjectModal'
+import type { Project } from '@/lib/types'
+
+interface UI {
+  isEdit: boolean
+  href: (path: string, hash?: string) => string
+  openContact: () => void
+  openEditor: (project: Project | null) => void
+}
+
+const Ctx = createContext<UI | null>(null)
+
+export function useUI() {
+  const ctx = useContext(Ctx)
+  if (!ctx) throw new Error('useUI must be used inside UIProvider')
+  return ctx
+}
+
+export default function UIProvider({ children }: { children: React.ReactNode }) {
+  const params = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const isEdit = params.get('edit') === 'true'
+
+  const [contactOpen, setContactOpen] = useState(false)
+  const [editor, setEditor] = useState<{ open: boolean; project: Project | null }>({
+    open: false,
+    project: null
+  })
+
+  const href = useCallback(
+    (path: string, hash?: string) =>
+      `${path}${isEdit ? '?edit=true' : ''}${hash ? `#${hash}` : ''}`,
+    [isEdit]
+  )
+
+  const openContact = useCallback(() => setContactOpen(true), [])
+  const openEditor = useCallback(
+    (project: Project | null) => setEditor({ open: true, project }),
+    []
+  )
+
+  const value = useMemo(
+    () => ({ isEdit, href, openContact, openEditor }),
+    [isEdit, href, openContact, openEditor]
+  )
+
+  return (
+    <Ctx.Provider value={value}>
+      {children}
+      <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
+      <ProjectModal
+        open={editor.open}
+        project={editor.project}
+        onClose={() => setEditor((s) => ({ ...s, open: false }))}
+        onSaved={() => {
+          setEditor((s) => ({ ...s, open: false }))
+          router.refresh()
+        }}
+        onDeleted={() => {
+          setEditor((s) => ({ ...s, open: false }))
+          if (pathname.startsWith('/work/')) router.push(href('/work'))
+          router.refresh()
+        }}
+      />
+    </Ctx.Provider>
+  )
+}
+
+=== lib/seo.ts ===
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.mavxframes.com').replace(/\/$/, '')
+
+export const BRAND = {
+  name: 'MAVX Frames',
+  base: 'Chennai',
+  region: 'Tamil Nadu',
+  tagline: 'Wedding, pre-wedding and event photography in Chennai, travelling across Tamil Nadu',
+  description:
+    'MAVX Frames is a Chennai photographer for weddings, pre-wedding shoots, engagements, portraits and events. We travel to Coimbatore, Madurai, Trichy, Thanjavur, Pondicherry, Vellore and cities across Tamil Nadu.',
+  geo: { lat: 13.0827, lng: 80.2707 },
+  ogImage: '/images/a-love-quietly-told.png'
+}
+
+export type City = {
+  slug: string
+  name: string
+  hours: number
+  intro: string
+  spots: { name: string; note: string }[]
+  shoots: string[]
+}
+
+const WEDDING = ['Weddings', 'Pre-wedding shoots', 'Engagements', 'Portraits and events']
+
+export const CITIES: City[] = [
+  {
+    slug: 'chennai',
+    name: 'Chennai',
+    hours: 0,
+    intro:
+      'Chennai is home base. We shoot weddings in temple mandapams, beach resorts and city banquet halls, and pre-wedding stories along the coast and in the old neighbourhoods.',
+    spots: [
+      { name: 'Marina and Elliot’s Beach', note: 'Soft sunrise light and open sand for couple portraits.' },
+      { name: 'Mylapore and Kapaleeshwarar Temple', note: 'Colourful gopuram and street life for traditional frames.' },
+      { name: 'Fort St George and Santhome', note: 'Colonial architecture and quiet corners for editorial shots.' },
+      { name: 'East Coast Road', note: 'Resorts, casuarina groves and sea views a short drive from the city.' }
+    ],
+    shoots: WEDDING
+  },
+  {
+    slug: 'mahabalipuram',
+    name: 'Mahabalipuram',
+    hours: 1.5,
+    intro:
+      'Mahabalipuram is one of the closest and most photogenic pre-wedding destinations from Chennai, with ancient rock-cut temples beside the Bay of Bengal.',
+    spots: [
+      { name: 'Shore Temple', note: 'Granite temple against the sea, best at sunrise.' },
+      { name: 'Five Rathas', note: 'Monolithic stone chariots with warm, textured backdrops.' },
+      { name: 'Arjuna’s Penance', note: 'Giant carved rock relief for dramatic wide frames.' },
+      { name: 'ECR beachfront', note: 'Quiet stretches of sand and resort lawns for destination weddings.' }
+    ],
+    shoots: WEDDING
+  },
+  {
+    slug: 'kanchipuram',
+    name: 'Kanchipuram',
+    hours: 2,
+    intro:
+      'Kanchipuram, the silk city and temple town, suits traditional weddings and pre-wedding shoots in silk sarees against some of the oldest temples in South India.',
+    spots: [
+      { name: 'Kailasanathar Temple', note: 'Sandstone Pallava temple with soft, warm tones.' },
+      { name: 'Ekambareswarar Temple', note: 'Tall gopuram and long pillared corridors.' },
+      { name: 'Kamakshi Amman Temple', note: 'Traditional ceremonies and festival atmosphere.' },
+      { name: 'Silk weaving lanes', note: 'Handloom workshops for authentic cultural portraits.' }
+    ],
+    shoots: WEDDING
+  },
+  {
+    slug: 'vellore',
+    name: 'Vellore',
+    hours: 3,
+    intro:
+      'Vellore combines a historic fort, a golden temple and nearby hills, giving couples and families varied backdrops within a morning’s drive of Chennai.',
+    spots: [
+      { name: 'Vellore Fort', note: 'Moat, stone ramparts and the Jalakandeswarar Temple inside.' },
+      { name: 'Sripuram Golden Temple', note: 'Gold-clad sanctum with landscaped, star-shaped paths.' },
+      { name: 'Yelagiri Hills', note: 'Cool hill scenery for pre-wedding and family shoots.' },
+      { name: 'Amirthi forest area', note: 'Green, shaded settings for relaxed portraits.' }
+    ],
+    shoots: WEDDING
+  },
+  {
+    slug: 'pondicherry',
+    name: 'Pondicherry',
+    hours: 3.5,
+    intro:
+      'Pondicherry (Puducherry) is a favourite for pre-wedding and destination shoots, with its French Quarter streets, seafront and beaches only a few hours from Chennai.',
+    spots: [
+      { name: 'White Town', note: 'Pastel colonial buildings and bougainvillea-lined lanes.' },
+      { name: 'Promenade Beach', note: 'Seafront walks and golden-hour portraits.' },
+      { name: 'Auroville', note: 'Open spaces and distinctive architecture for modern frames.' },
+      { name: 'Paradise and Serenity Beach', note: 'Quieter beaches for couple and family shoots.' }
+    ],
+    shoots: WEDDING
+  },
+  {
+    slug: 'tiruvannamalai',
+    name: 'Tiruvannamalai',
+    hours: 3.5,
+    intro:
+      'Tiruvannamalai sits at the foot of the sacred Arunachala hill, with a vast temple complex that works well for traditional weddings and cultural storytelling.',
+    spots: [
+      { name: 'Arunachaleswarar Temple', note: 'One of the largest temple complexes in Tamil Nadu.' },
+      { name: 'Arunachala Hill', note: 'Rocky slopes and sunrise views over the town.' },
+      { name: 'Girivalam path', note: 'Pilgrim walking route for documentary-style frames.' }
+    ],
+    shoots: WEDDING
+  },
+  {
+    slug: 'cuddalore',
+    name: 'Cuddalore',
+    hours: 4,
+    intro:
+      'Cuddalore (Kadalur) offers coastline, backwaters and the Pichavaram mangroves, a rare and photogenic setting for pre-wedding and family shoots.',
+    spots: [
+      { name: 'Pichavaram Mangrove Forest', note: 'Boat-lined channels and green canopy, among the largest mangrove areas in India.' },
+      { name: 'Silver Beach', note: 'Open beach for sunrise and golden-hour portraits.' },
+      { name: 'Fort St David', note: 'Old fort ruins for textured, historic backdrops.' }
+    ],
+    shoots: WEDDING
+  },
+  {
+    slug: 'chidambaram',
+    name: 'Chidambaram',
+    hours: 4.5,
+    intro:
+      'Chidambaram is a temple town known for the Nataraja Temple, and it sits close to the Pichavaram backwaters, so one trip can cover ceremony and a scenic couple shoot.',
+    spots: [
+      { name: 'Thillai Nataraja Temple', note: 'Ornate gopurams and a large temple tank.' },
+      { name: 'Pichavaram backwaters', note: 'Mangrove channels a short drive from town.' },
+      { name: 'Town streets and bazaars', note: 'Everyday life for candid, traditional frames.' }
+    ],
+    shoots: WEDDING
+  },
+  {
+    slug: 'kumbakonam',
+    name: 'Kumbakonam',
+    hours: 5.5,
+    intro:
+      'Kumbakonam is a Cauvery-delta temple town surrounded by Chola-era monuments, well suited to traditional weddings and heritage pre-wedding shoots.',
+    spots: [
+      { name: 'Airavatesvara Temple, Darasuram', note: 'UNESCO-listed Chola temple with fine stone carving.' },
+      { name: 'Mahamaham Tank', note: 'Large temple tank surrounded by shrines.' },
+      { name: 'Sarangapani and Kumbeswarar temples', note: 'Towering gopurams in the town centre.' },
+      { name: 'Cauvery river banks', note: 'Green delta fields and riverside light.' }
+    ],
+    shoots: WEDDING
+  },
+  {
+    slug: 'trichy',
+    name: 'Trichy (Tiruchirappalli)',
+    hours: 5.5,
+    intro:
+      'Trichy, also called Tiruchi, has the Srirangam temple island, the Rockfort and the Cauvery river, giving us strong traditional and riverside backdrops for weddings.',
+    spots: [
+      { name: 'Srirangam Ranganathaswamy Temple', note: 'Huge temple complex with towering gopurams.' },
+      { name: 'Rockfort Temple', note: 'Hilltop temple with panoramic views over the city.' },
+      { name: 'Kallanai (Grand Anicut)', note: 'Ancient dam on the Cauvery for open, riverside frames.' },
+      { name: 'Mukkombu', note: 'Quiet river spot for golden-hour portraits.' }
+    ],
+    shoots: WEDDING
+  },
+  {
+    slug: 'thanjavur',
+    name: 'Thanjavur',
+    hours: 6,
+    intro:
+      'Thanjavur is home to the Brihadeeswarar Temple and the Maratha Palace, making it a natural choice for heritage weddings and classical pre-wedding shoots.',
+    spots: [
+      { name: 'Brihadeeswarar Temple', note: 'UNESCO-listed Chola temple with a monumental vimana.' },
+      { name: 'Thanjavur Maratha Palace', note: 'Arched halls and courtyards for editorial portraits.' },
+      { name: 'Saraswathi Mahal Library', note: 'Historic palace library within the palace complex.' },
+      { name: 'Paddy fields around the delta', note: 'Green fields for relaxed couple shoots.' }
+    ],
+    shoots: WEDDING
+  },
+  {
+    slug: 'karaikudi',
+    name: 'Karaikudi (Chettinad)',
+    hours: 7,
+    intro:
+      'Karaikudi is the centre of Chettinad, known for grand mansions, patterned tiles and heritage homes that give couples and families unusual, richly textured backdrops.',
+    spots: [
+      { name: 'Chettinad mansions', note: 'Wide courtyards, teak pillars and carved doors.' },
+      { name: 'Athangudi tile workshops', note: 'Colourful handmade tiles for detail and portrait frames.' },
+      { name: 'Kanadukathan Palace', note: 'Large Chettinad palace-style home.' }
+    ],
+    shoots: WEDDING
+  },
+  {
+    slug: 'salem',
+    name: 'Salem',
+    hours: 5,
+    intro:
+      'Salem is a good base for weddings and hill-station pre-wedding shoots, with Yercaud and the Mettur backwaters close by.',
+    spots: [
+      { name: 'Yercaud', note: 'Cool hill scenery, coffee estates and a lake.' },
+      { name: 'Lady’s Seat viewpoint', note: 'Sunrise and sunset views over the valley.' },
+      { name: 'Mettur Dam', note: 'Large reservoir and open landscapes.' }
+    ],
+    shoots: WEDDING
+  },
+  {
+    slug: 'erode',
+    name: 'Erode',
+    hours: 6,
+    intro:
+      'Erode lies on the Cauvery and Bhavani rivers, with dams, temples and green countryside that suit weddings and relaxed outdoor shoots.',
+    spots: [
+      { name: 'Bhavani Kooduthurai', note: 'River confluence with the Sangameswarar Temple.' },
+      { name: 'Bhavanisagar Dam', note: 'Large dam with gardens and open views.' },
+      { name: 'Kodiveri Dam', note: 'Shallow river and rocky banks for portraits.' }
+    ],
+    shoots: WEDDING
+  },
+  {
+    slug: 'coimbatore',
+    name: 'Coimbatore',
+    hours: 8,
+    intro:
+      'Coimbatore (Kovai) is our western base for weddings, with the Western Ghats, tea and coconut country and hill temples close to the city.',
+    spots: [
+      { name: 'Marudhamalai Temple', note: 'Hilltop Murugan temple with views over the plains.' },
+      { name: 'Perur Pateeswarar Temple', note: 'Old temple with ornate carved pillars.' },
+      { name: 'Pollachi coconut farms', note: 'Lush green farmland for pre-wedding and family shoots.' },
+      { name: 'Valparai tea estates', note: 'Misty hills and tea terraces in the Anamalai range.' }
+    ],
+    shoots: WEDDING
+  },
+  {
+    slug: 'madurai',
+    name: 'Madurai',
+    hours: 8,
+    intro:
+      'Madurai, one of the oldest living cities in India, is built around the Meenakshi Amman Temple and offers heritage settings for traditional weddings.',
+    spots: [
+      { name: 'Meenakshi Amman Temple', note: 'Colourful gopurams and long pillared halls.' },
+      { name: 'Thirumalai Nayakkar Mahal', note: 'Large arched palace for grand portraits.' },
+      { name: 'Vandiyur Mariamman Teppakulam', note: 'Big temple tank, especially lovely at dusk.' },
+      { name: 'Alagar Koil', note: 'Forested hill temple outside the city.' }
+    ],
+    shoots: WEDDING
+  },
+  {
+    slug: 'ooty',
+    name: 'Ooty (Udhagamandalam)',
+    hours: 10,
+    intro:
+      'Ooty in the Nilgiri hills is one of Tamil Nadu’s favourite pre-wedding destinations, with tea gardens, pine forests and mist in cool weather.',
+    spots: [
+      { name: 'Government Botanical Garden', note: 'Terraced lawns and flower beds.' },
+      { name: 'Doddabetta Peak', note: 'The highest point in the Nilgiris with wide valley views.' },
+      { name: 'Ooty Lake and Pykara', note: 'Water, boats and forest edges for couple portraits.' },
+      { name: 'Tea estates', note: 'Rolling green terraces in soft morning light.' }
+    ],
+    shoots: ['Pre-wedding shoots', 'Weddings', 'Engagements', 'Family and couple portraits']
+  },
+  {
+    slug: 'kodaikanal',
+    name: 'Kodaikanal',
+    hours: 9.5,
+    intro:
+      'Kodaikanal is a hill-station favourite for pre-wedding shoots, with a star-shaped lake, pine forests and misty viewpoints in the Palani hills.',
+    spots: [
+      { name: 'Kodai Lake', note: 'Lakeside paths and boats for relaxed portraits.' },
+      { name: 'Pine Forest', note: 'Tall, straight pines with soft, filtered light.' },
+      { name: 'Coaker’s Walk', note: 'Cliff-edge path with valley views.' },
+      { name: 'Pillar Rocks', note: 'Large granite pillars for dramatic wide frames.' }
+    ],
+    shoots: ['Pre-wedding shoots', 'Weddings', 'Engagements', 'Family and couple portraits']
+  },
+  {
+    slug: 'rameswaram',
+    name: 'Rameswaram',
+    hours: 10,
+    intro:
+      'Rameswaram is a sacred island town with the Ramanathaswamy Temple, the Pamban Bridge and Dhanushkodi’s open sands, a dramatic setting for destination shoots.',
+    spots: [
+      { name: 'Ramanathaswamy Temple', note: 'Famous for its long pillared corridors.' },
+      { name: 'Pamban Bridge', note: 'Sea bridge and open water for wide frames.' },
+      { name: 'Dhanushkodi', note: 'Remote sandy tip with the sea on both sides.' }
+    ],
+    shoots: ['Pre-wedding shoots', 'Weddings', 'Engagements', 'Family and couple portraits']
+  }
+]
+
+export const getCity = (slug: string) => CITIES.find((c) => c.slug === slug)
+
+export const cityPath = (slug: string) => `/photographer-in/${slug}`
+
+export const hoursLabel = (h: number) => {
+  if (h === 0) return 'based in the city'
+  const whole = Math.floor(h)
+  const half = h - whole >= 0.5
+  const n = half ? `${whole}.5` : `${whole}`
+  return `about ${n} hours by road from Chennai`
+}
+
+export const cityTitle = (c: City) =>
+  c.slug === 'chennai'
+    ? `Wedding & Pre-Wedding Photographer in Chennai | ${BRAND.name}`
+    : `Wedding & Pre-Wedding Photographer in ${c.name.split(' (')[0]} | ${BRAND.name}`
+
+export const cityDescription = (c: City) => {
+  const n = c.name.split(' (')[0]
+  return c.slug === 'chennai'
+    ? `${BRAND.name} is a Chennai wedding, pre-wedding and portrait photographer. Candid, natural stories at temples, beaches and banquet halls across the city.`
+    : `Looking for a photographer in ${n}? ${BRAND.name} travels from Chennai for weddings, pre-wedding shoots and portraits in ${n}, ${hoursLabel(c.hours)}.`
+}
+
+export const absUrl = (path: string) => (path.startsWith('http') ? path : `${SITE_URL}${path.startsWith('/') ? '' : '/'}${path}`)
+
+=== lib/site.ts ===
+export const site = {
+  name: 'MAVX Frames',
+  city: 'Chennai',
+  instagram: 'https://instagram.com/',
+  youtube: 'https://youtube.com/',
+  email: 'mailto:hello@example.com',
+  aboutImage: '/images/the-hands-that-hold.png',
+  contactImage: '/images/threads-of-gold.png',
+  aboutHeading: ['Real people.', 'Unrepeatable', 'moments.'],
+  aboutText:
+    'I’m Aravindh, founder of MAVX Frames, a wedding photography brand based in Chennai. I look for the little glances, the quiet promises, and everything in between — the moments that make your story yours.',
+  shootTypes: [
+    'Wedding',
+    'Pre-wedding',
+    'Engagement',
+    'Portrait',
+    'Maternity',
+    'Event',
+    'Commercial',
+    'Fashion',
+    'Other'
+  ]
+}
+

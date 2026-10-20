@@ -1,3 +1,4 @@
+/* app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -24,6 +25,8 @@
 
 html {
   background: rgb(var(--paper));
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body,
@@ -72,7 +75,7 @@ body {
 
 @layer components {
   .field {
-    @apply w-full rounded-md border border-line bg-paper px-3 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-mute/70 focus:border-ink;
+    @apply w-full rounded-md border border-line bg-paper px-3 py-3 text-base text-ink outline-none transition-colors placeholder:text-mute/70 focus:border-ink md:py-2.5 md:text-sm;
   }
 
   .label {
@@ -136,8 +139,14 @@ body {
 }
 
 .site-nav-bar {
-  height: 4.25rem;
+  height: 4rem;
   transition: height 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (min-width: 768px) {
+  .site-nav-bar {
+    height: 4.25rem;
+  }
 }
 
 .site-nav[data-scrolled='true'] .site-nav-bar {
@@ -221,6 +230,13 @@ body {
   background: rgb(127 127 127 / 0.16);
 }
 
+@media (pointer: coarse) {
+  .nav-icon-btn {
+    height: 2.75rem;
+    width: 2.75rem;
+  }
+}
+
 .nav-divider {
   border-left: 1px solid rgb(127 127 127 / 0.35);
 }
@@ -261,10 +277,14 @@ button:focus-visible, a:focus-visible { outline: 2px solid rgb(var(--accent)); o
 }
 
 /* Flow-based hero: the lower photo always follows the title and description. */
-.home-hero-grid { display: grid; gap: 2.5rem; }
+.home-hero-grid { display: grid; gap: 2rem; }
 .home-hero-copy { position: relative; z-index: 1; min-width: 0; }
-.home-hero-media { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+.home-hero-media { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .home-hero-portrait { grid-column: 1 / -1; }
+@media (min-width: 640px) {
+  .home-hero-grid { gap: 2.5rem; }
+  .home-hero-media { gap: 1.25rem; }
+}
 @media (min-width: 768px) {
   .home-hero-grid {
     grid-template-columns: minmax(0,44fr) minmax(0,29fr) minmax(0,21fr);
@@ -314,7 +334,7 @@ h1 .text-accent, h2 .text-accent, h3 .text-accent {
 
 
 /* ------------------------------------------------------------------
-   MAV X Frames Logo
+   Brand logo
 ------------------------------------------------------------------- */
 
 .brand-logo {

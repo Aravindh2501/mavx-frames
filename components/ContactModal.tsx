@@ -1,3 +1,4 @@
+// components/ContactModal.tsx
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
@@ -74,12 +75,15 @@ export default function ContactModal({
   return (
     <div
       data-lenis-prevent
-      className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Contact"
+      className="fixed inset-0 z-[100] flex overflow-y-auto overscroll-contain bg-black/60 p-3 backdrop-blur-sm sm:p-4"
       onMouseDown={(e) => e.target === e.currentTarget && close()}
     >
       <div
         ref={panel}
-        className="grid w-full max-w-3xl overflow-hidden rounded-lg bg-paper shadow-2xl md:grid-cols-[0.9fr_1.1fr]"
+        className="m-auto grid w-full max-w-3xl overflow-hidden rounded-lg bg-paper shadow-2xl md:grid-cols-[0.9fr_1.1fr]"
       >
         <div className="relative hidden min-h-[420px] md:block">
           <img
@@ -88,28 +92,30 @@ export default function ContactModal({
             className="absolute inset-0 h-full w-full object-cover"
           />
         </div>
-        <div className="relative p-7 md:p-9">
+        <div className="relative p-5 sm:p-7 md:p-9">
           <button
             onClick={close}
             aria-label="Close"
-            className="absolute right-4 top-4 text-mute transition-colors hover:text-ink"
+            className="absolute right-2 top-2 inline-flex h-11 w-11 items-center justify-center text-mute transition-colors hover:text-ink sm:right-3 sm:top-3"
           >
             <CloseIcon />
           </button>
 
           {status === 'done' ? (
-            <div className="flex h-full min-h-[320px] flex-col justify-center">
+            <div className="flex h-full min-h-[280px] flex-col justify-center sm:min-h-[320px]">
               <h2 className="font-serif text-3xl">Thank you.</h2>
               <p className="mt-3 text-sm text-mute">
                 Your note has reached me. I’ll get back to you very soon.
               </p>
-              <button onClick={close} className="btn-ghost mt-6 self-start">
+              <button onClick={close} className="btn-ghost mt-6 min-h-[44px] self-start">
                 Close
               </button>
             </div>
           ) : (
             <form onSubmit={submit} className="flex flex-col gap-3">
-              <h2 className="font-serif text-3xl leading-tight">Let’s make something real.</h2>
+              <h2 className="pr-10 font-serif text-2xl leading-tight sm:text-3xl">
+                Let’s make something real.
+              </h2>
               <p className="mb-2 text-xs text-mute">
                 Tell me a bit about your plans and I’ll get back to you soon.
               </p>
@@ -117,6 +123,7 @@ export default function ContactModal({
                 required
                 className="field"
                 placeholder="Your name"
+                autoComplete="name"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
@@ -124,6 +131,7 @@ export default function ContactModal({
                 required
                 className="field"
                 placeholder="Email or phone"
+                autoComplete="email"
                 value={form.contact}
                 onChange={(e) => setForm({ ...form, contact: e.target.value })}
               />
@@ -146,7 +154,11 @@ export default function ContactModal({
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
               />
               {error && <p className="text-xs text-accent">{error}</p>}
-              <button type="submit" disabled={status === 'sending'} className="btn-solid self-start">
+              <button
+                type="submit"
+                disabled={status === 'sending'}
+                className="btn-solid min-h-[44px] self-start"
+              >
                 {status === 'sending' ? 'Sending…' : 'Send enquiry'}
               </button>
             </form>
