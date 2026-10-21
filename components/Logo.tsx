@@ -27,7 +27,7 @@ export default function Logo({
   return (
     <Image
       src="/logo.svg"
-      alt="MAV X Frames"
+      alt="MAVX Frames"
       width={width}
       height={height}
       priority={priority}

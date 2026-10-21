@@ -2,7 +2,7 @@
 
 ## Install
 
-This ZIP contains the full project. Back up your existing project, then merge these files. Keep your real `.env.local` and Vercel settings; `.env.example` contains public contact details and empty secret fields. Never overwrite the live database with sample data.
+This ZIP contains the full project. Back up your existing project, then merge these files. Keep your real `.env.local` and Vercel settings; only a blank `.env.example` is included. Never overwrite the live database with sample data.
 
 Run `pnpm install --frozen-lockfile`, `pnpm typecheck`, `pnpm build`, then `pnpm start`.
 
@@ -51,7 +51,7 @@ Changing `data/projects.json` does not rewrite existing Turso records. Refresh e
 
 Clear business facts, useful visible answers, crawlable HTML and consistent structured data support search and AI understanding. No hidden prompts, fake reviews, invented offices or keyword stuffing were added. There is no special schema or file that guarantees AI-answer inclusion. FAQ markup does not promise a Google FAQ rich result for a photography business.
 
-Use genuine addresses and operating areas for eligible Google Business Profiles. The public phone (+91 63697 54272), email (mavxstudio@gmail.com) and Instagram (@mav_x_frames) are configured. Exact addresses and the final domain were not supplied. Organization markup is used rather than inventing a LocalBusiness address.
+Use genuine addresses and operating areas for eligible Google Business Profiles. Exact addresses, phone, final domain and social profiles were not supplied. Organization markup is used rather than inventing a LocalBusiness address.
 
 ## Before going live
 
@@ -64,10 +64,10 @@ Confirm domain redirects and public contacts; test enquiry receipt; review the o
 - https://nextjs.org/docs/app/api-reference/functions/generate-metadata
 - https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap
 
-## Confirmed public contacts
+## Latest changes
 
-- Phone: +91 63697 54272
-- Email: mavxstudio@gmail.com
-- Instagram: https://www.instagram.com/mav_x_frames/
-
-These are defaults in `lib/site.ts`; existing NEXT_PUBLIC contact variables override them. Update old Vercel values and redeploy if necessary. The public email does not configure enquiry delivery: keep your Resend settings and set ENQUIRY_TO_EMAIL to the intended receiving inbox.
+- Heading masks no longer clip descenders (g, y, p) on project, work, about and home headings.
+- In Focus images show immediately; the reveal and parallax animations were removed.
+- Enquiry modal has a filled send button and shows phone, email and Instagram when set in `.env.local` (`NEXT_PUBLIC_CONTACT_PHONE`, `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_INSTAGRAM_URL`).
+- Image shapes are now read on the server (`lib/imageSize.ts`), so galleries and the hero render in the right layout in the first HTML with no layout shift.
+- Hero, next-story and city pages use descriptive alt text and the shared metadata helper.

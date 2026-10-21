@@ -29,12 +29,12 @@ const frameStyle = (project: Project) => ({
         : undefined
 })
 
-export default function InFocus({ projects }: { projects: Project[] }) {
+export default function InFocus({ projects, ratios: initial }: { projects: Project[]; ratios?: Record<string, number> }) {
   const { isEdit, href, openEditor, openContact } = useUI()
   const root = useRef<HTMLElement>(null)
   const pin = useRef<HTMLDivElement>(null)
   const track = useRef<HTMLDivElement>(null)
-  const { ratios, ratioOf, ready } = useImageRatios(projects.map((p) => p.cover))
+  const { ratios, ratioOf, ready } = useImageRatios(projects.map((p) => p.cover), 2500, initial)
   const known = Object.keys(ratios).length
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function InFocus({ projects }: { projects: Project[] }) {
 
       const dist = () => Math.max(0, trackEl.scrollWidth - window.innerWidth)
 
-      const tween = gsap.to(trackEl, {
+      gsap.to(trackEl, {
         x: () => -dist(),
         ease: 'none',
         scrollTrigger: {
@@ -74,49 +74,6 @@ export default function InFocus({ projects }: { projects: Project[] }) {
           anticipatePin: 1,
           invalidateOnRefresh: true
         }
-      })
-
-      gsap.utils.toArray<HTMLElement>('.focus-card').forEach((card) => {
-        const img = card.querySelector('.focus-img')
-        if (img) {
-          gsap.fromTo(
-            img,
-            { xPercent: -1.8, scale: 1.01 },
-            {
-              xPercent: 1.8,
-              scale: 1,
-              ease: 'none',
-              scrollTrigger: {
-                trigger: card,
-                containerAnimation: tween,
-                start: 'left right',
-                end: 'right left',
-                scrub: true
-              }
-            }
-          )
-        }
-        gsap.from(card, {
-          y: 50,
-          autoAlpha: 0,
-          duration: 0.9,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: card,
-            containerAnimation: tween,
-            start: 'left 96%',
-            toggleActions: 'play none none none'
-          }
-        })
-      })
-
-      gsap.from('.focus-head > *', {
-        y: 40,
-        autoAlpha: 0,
-        duration: 1.1,
-        stagger: 0.12,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: root.current, start: 'top 80%' }
       })
 
       ScrollTrigger.refresh()
@@ -165,7 +122,7 @@ export default function InFocus({ projects }: { projects: Project[] }) {
                       ...frameStyle(p)
                     }}
                   >
-                    <div className="focus-img gpu absolute inset-y-0 -left-[2%] w-[104%]">
+                    <div className="focus-img absolute inset-0">
                       <div className="relative h-full w-full transition-transform duration-[900ms] ease-out group-hover:scale-[1.04]">
                         <Photo src={p.cover} alt={projectAlt(p)} sizes="(min-width:768px) 45vw, 84vw" className="object-cover" />
                       </div>

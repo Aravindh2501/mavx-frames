@@ -87,11 +87,6 @@ export default function Footer({
           </div>
         )}
       </div>
-      <div className="mx-auto flex max-w-[1280px] flex-wrap gap-x-6 gap-y-3 px-5 pb-5 text-sm text-mute sm:px-6 md:px-10">
-        {site.phone && <a href={`tel:${site.phone.replace(/[^+0-9]/g, '')}`} className="hover:text-accent">{site.phone === '+916369754272' ? '+91 63697 54272' : site.phone}</a>}
-        {site.email && <a href={site.email} className="hover:text-accent">{site.email.replace('mailto:', '')}</a>}
-        {site.instagram && <a href={site.instagram} className="hover:text-accent">Instagram</a>}
-      </div>
       <p className="mx-auto max-w-[1280px] px-5 pb-8 text-xs leading-relaxed text-mute sm:px-6 md:px-10">MAVX Frames · Chennai &amp; Coimbatore · Photography and films across Tamil Nadu.</p>
     </footer>
   )

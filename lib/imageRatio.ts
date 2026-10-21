@@ -59,15 +59,25 @@ const fromCache = (srcs: string[]) => {
   return out
 }
 
-export function useImageRatios(input: string[], timeout = 2500) {
+export function useImageRatios(input: string[], timeout = 2500, initial: Record<string, number> = {}) {
   const key = input.filter(Boolean).join('|')
   const srcs = useMemo(() => (key ? key.split('|') : []), [key])
-  const [ratios, setRatios] = useState<Record<string, number>>({})
+  const [ratios, setRatios] = useState<Record<string, number>>(() => {
+    const out: Record<string, number> = {}
+    srcs.forEach((s) => {
+      const value = initial[s] ?? cache.get(s)
+      if (value) out[s] = value
+    })
+    return out
+  })
   const [expired, setExpired] = useState(false)
 
   useEffect(() => {
     let alive = true
     setExpired(false)
+    srcs.forEach((s) => {
+      if (initial[s] && !cache.has(s)) cache.set(s, initial[s])
+    })
     setRatios(fromCache(srcs))
     const timer = window.setTimeout(() => alive && setExpired(true), timeout)
     Promise.all(srcs.map(probeRatio)).then((list) => {

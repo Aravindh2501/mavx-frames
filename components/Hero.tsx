@@ -6,8 +6,14 @@ import { clampRatio, useImageRatios } from '@/lib/imageRatio'
 import Photo from './Photo'
 import { BRAND } from '@/lib/seo'
 
+export interface HeroImage {
+  src: string
+  alt: string
+}
+
 interface Props {
-  pool: string[]
+  pool: HeroImage[]
+  ratios?: Record<string, number>
 }
 
 type Slot = 'portrait' | 'small' | 'wide'
@@ -37,10 +43,12 @@ function pickImages(pool: string[], ratios: Record<string, number>) {
   }
 }
 
-export default function Hero({ pool }: Props) {
+export default function Hero({ pool, ratios: initial }: Props) {
   const root = useRef<HTMLElement>(null)
-  const { ratios, ready } = useImageRatios(pool, 1800)
-  const picks = useMemo(() => pickImages(pool, ratios), [pool, ratios])
+  const srcs = useMemo(() => pool.map((p) => p.src), [pool])
+  const { ratios, ready } = useImageRatios(srcs, 1800, initial)
+  const picks = useMemo(() => pickImages(srcs, ratios), [srcs, ratios])
+  const altFor = (src: string) => pool.find((p) => p.src === src)?.alt ?? BRAND.name
 
   const ratioFor = (slot: Slot) => {
     const known = ratios[picks[slot]]
@@ -54,7 +62,7 @@ export default function Hero({ pool }: Props) {
       if (prefersReducedMotion()) return
       gsap
         .timeline({ defaults: { ease: 'power4.out' } })
-        .from('.hero-line', { yPercent: 118, duration: 1.3, stagger: 0.14 }, 0.15)
+        .from('.hero-line', { yPercent: 135, duration: 1.3, stagger: 0.14 }, 0.15)
     },
     { scope: root }
   )
@@ -87,14 +95,14 @@ export default function Hero({ pool }: Props) {
       <div className="mx-auto max-w-[1280px] px-5 sm:px-6 md:px-10">
         <div className="home-hero-grid">
           <div className="home-hero-copy">
-            <h1 className="font-serif text-[clamp(2.9rem,7.2vw,6.5rem)] leading-[1.02] tracking-[-0.07em]">
-              <span className="block overflow-hidden py-[0.06em]">
+            <h1 className="font-serif text-[clamp(2.9rem,7.2vw,6.5rem)] leading-[1.06] tracking-[-0.07em]">
+              <span className="mask-line block">
                 <span className="hero-line block">Your story.</span>
               </span>
-              <span className="block overflow-hidden py-[0.02em]">
+              <span className="mask-line block">
                 <span className="hero-line block">Every</span>
               </span>
-              <span className="block overflow-hidden py-[0.06em]">
+              <span className="mask-line block">
                 <span className="hero-line block text-accent">frame.</span>
               </span>
             </h1>
@@ -109,7 +117,7 @@ export default function Hero({ pool }: Props) {
               >
                 <Photo
                   src={picks.portrait}
-                  alt={`Selected image from the ${BRAND.name} portfolio`}
+                  alt={altFor(picks.portrait)}
                   priority
                   sizes="(min-width:768px) 28vw, 76vw"
                   className="object-cover"
@@ -120,7 +128,7 @@ export default function Hero({ pool }: Props) {
               <div className={frame} style={{ aspectRatio: ratioFor('small'), visibility: hidden }}>
                 <Photo
                   src={picks.small}
-                  alt={`Photography collection by ${BRAND.name}`}
+                  alt={altFor(picks.small)}
                   priority
                   sizes="(min-width:768px) 23vw, 50vw"
                   className="object-cover"
@@ -131,7 +139,7 @@ export default function Hero({ pool }: Props) {
               <div className={frame} style={{ aspectRatio: ratioFor('wide'), visibility: hidden }}>
                 <Photo
                   src={picks.wide}
-                  alt={`Featured image from ${BRAND.name}`}
+                  alt={altFor(picks.wide)}
                   priority
                   sizes="(min-width:768px) 40vw, 50vw"
                   className="object-cover"

@@ -45,7 +45,7 @@ export default function WorkHero({ slides }: { slides: Project[] }) {
       })
       gsap.fromTo(
         '.wh-line',
-        { yPercent: 120 },
+        { yPercent: 135 },
         { yPercent: 0, duration: 1.2, stagger: 0.1, ease: 'power4.out', delay: 0.35 }
       )
     },
@@ -80,8 +80,8 @@ export default function WorkHero({ slides }: { slides: Project[] }) {
             {current.location ? ` · ${current.location}` : ''}
           </p>
         </div>
-        <div className="mt-4 overflow-hidden py-[0.06em]">
-          <h2 className="wh-line max-w-[18ch] font-serif text-[clamp(2.8rem,8vw,7rem)] leading-[0.98] tracking-[-0.03em]">
+        <div className="mask-line mt-4">
+          <h2 className="wh-line max-w-[18ch] font-serif text-[clamp(2.8rem,8vw,7rem)] leading-[1.08] tracking-[-0.03em]">
             {current.title}
           </h2>
         </div>

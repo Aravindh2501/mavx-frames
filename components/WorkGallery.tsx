@@ -14,7 +14,7 @@ import { useUI } from './UIProvider'
 import { CATEGORIES } from '@/lib/types'
 import type { Project } from '@/lib/types'
 
-export default function WorkGallery({ projects }: { projects: Project[] }) {
+export default function WorkGallery({ projects, ratios: seeded }: { projects: Project[]; ratios?: Record<string, number> }) {
   const { isEdit, href, openEditor } = useUI()
   const params = useSearchParams()
   const root = useRef<HTMLElement>(null)
@@ -40,7 +40,7 @@ export default function WorkGallery({ projects }: { projects: Project[] }) {
     [projects]
   )
 
-  const { ratioOf, ready } = useImageRatios(useMemo(() => projects.map((p) => p.cover), [projects]))
+  const { ratioOf, ready } = useImageRatios(useMemo(() => projects.map((p) => p.cover), [projects]), 2500, seeded)
 
   const select = (key: string) => {
     if (key === active) return

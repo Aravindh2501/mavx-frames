@@ -14,7 +14,15 @@ import { ArrowLeft, ArrowRight, CloseIcon, PencilIcon } from './Icons'
 import { useUI } from './UIProvider'
 import type { Project } from '@/lib/types'
 
-export default function ProjectDetail({ project, next }: { project: Project; next: Project | null }) {
+export default function ProjectDetail({
+  project,
+  next,
+  ratios: initial
+}: {
+  project: Project
+  next: Project | null
+  ratios?: Record<string, number>
+}) {
   const { isEdit, href, openEditor } = useUI()
   const root = useRef<HTMLDivElement>(null)
   const overlay = useRef<HTMLDivElement>(null)
@@ -25,7 +33,7 @@ export default function ProjectDetail({ project, next }: { project: Project; nex
     () => (project.photos.length ? project.photos : [project.cover]),
     [project.photos, project.cover]
   )
-  const { ratios, ready } = useImageRatios(gallery)
+  const { ratios, ready } = useImageRatios(gallery, 2500, initial)
 
   const tiles = useMemo(
     () => layoutGallery(gallery.map((src) => clampRatio(ratios[src] ?? DEFAULT_RATIO, 0.5, 2.4))),
@@ -47,7 +55,7 @@ export default function ProjectDetail({ project, next }: { project: Project; nex
     () => {
       const tl = gsap.timeline({ defaults: { ease: 'power4.out' } })
       tl.from('.pd-hero-img', { scale: 1.2, autoAlpha: 0, duration: 2, ease: 'expo.out' }, 0)
-        .from('.pd-line', { yPercent: 115, duration: 1.2, stagger: 0.12 }, 0.5)
+        .from('.pd-line', { yPercent: 135, duration: 1.2, stagger: 0.12 }, 0.5)
         .from('.pd-sub', { autoAlpha: 0, y: 20, duration: 1 }, 0.9)
     },
     { scope: root, dependencies: [project.id] }
@@ -141,8 +149,8 @@ export default function ProjectDetail({ project, next }: { project: Project; nex
               {project.category} / {project.location}
             </p>
           </div>
-          <div className="mx-auto mt-3 max-w-4xl overflow-hidden py-[0.06em]">
-            <h1 className="pd-line font-serif text-[clamp(2.6rem,6.5vw,5.2rem)] leading-[1] tracking-[-0.03em]">
+          <div className="mask-line mx-auto mt-3 max-w-4xl">
+            <h1 className="pd-line font-serif text-[clamp(2.6rem,6.5vw,5.2rem)] leading-[1.08] tracking-[-0.03em]">
               {project.title}
             </h1>
           </div>
@@ -232,7 +240,7 @@ export default function ProjectDetail({ project, next }: { project: Project; nex
             <div className="relative aspect-[16/7] overflow-hidden bg-line">
               <Photo
                 src={next.cover}
-                alt={next.title}
+                alt={projectAlt(next)}
                 sizes="(min-width:768px) 50vw, 100vw"
                 className="object-cover transition-transform duration-[900ms] group-hover:scale-[1.05]"
               />

@@ -6,14 +6,14 @@ const profile = (value: string | undefined) => {
     return url.protocol === 'https:' && url.pathname !== '/' ? url.href : ''
   } catch { return '' }
 }
-const publicEmail = (process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'mavxstudio@gmail.com').trim()
+const publicEmail = (process.env.NEXT_PUBLIC_CONTACT_EMAIL || '').trim()
 export const site = {
   name: 'MAVX Frames',
   city: 'Chennai & Coimbatore',
-  instagram: profile(process.env.NEXT_PUBLIC_INSTAGRAM_URL || 'https://www.instagram.com/mav_x_frames/'),
+  instagram: profile(process.env.NEXT_PUBLIC_INSTAGRAM_URL),
   youtube: profile(process.env.NEXT_PUBLIC_YOUTUBE_URL),
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(publicEmail) ? `mailto:${publicEmail}` : '',
-  phone: (process.env.NEXT_PUBLIC_CONTACT_PHONE || '+916369754272').trim(),
+  phone: (process.env.NEXT_PUBLIC_CONTACT_PHONE || '').trim(),
   aboutImage: '/images/the-hands-that-hold.png',
   contactImage: '/images/threads-of-gold.png',
   aboutHeading: ['Good light.', 'Real connection.', 'Your story.'],

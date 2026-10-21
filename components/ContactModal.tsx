@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { gsap, useGSAP } from '@/lib/gsap'
-import { CloseIcon } from './Icons'
+import { CloseIcon, InstagramIcon, MailIcon, PhoneIcon } from './Icons'
 import { site } from '@/lib/site'
 
 type Status = 'idle' | 'sending' | 'done' | 'error'
@@ -40,6 +40,8 @@ export default function ContactModal({
   )
 
   if (!open) return null
+
+  const phoneHref = site.phone ? `tel:${site.phone.replace(/[^+\d]/g, '')}` : ''
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -157,10 +159,43 @@ export default function ContactModal({
               <button
                 type="submit"
                 disabled={status === 'sending'}
-                className="btn-solid min-h-[44px] self-start"
+                className="btn-filled mt-1 min-h-[48px] w-full sm:w-auto sm:self-start"
               >
                 {status === 'sending' ? 'Sending…' : 'Send enquiry'}
               </button>
+              {(phoneHref || site.email || site.instagram) && (
+                <ul className="mt-3 flex flex-col gap-2 border-t border-line pt-4 text-sm text-ink/80">
+                  {phoneHref && (
+                    <li>
+                      <a href={phoneHref} className="inline-flex items-center gap-2.5 transition-colors hover:text-accent">
+                        <PhoneIcon width={16} height={16} />
+                        {site.phone}
+                      </a>
+                    </li>
+                  )}
+                  {site.email && (
+                    <li>
+                      <a href={site.email} className="inline-flex items-center gap-2.5 break-all transition-colors hover:text-accent">
+                        <MailIcon width={16} height={16} />
+                        {site.email.replace('mailto:', '')}
+                      </a>
+                    </li>
+                  )}
+                  {site.instagram && (
+                    <li>
+                      <a
+                        href={site.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2.5 transition-colors hover:text-accent"
+                      >
+                        <InstagramIcon width={16} height={16} />
+                        Instagram
+                      </a>
+                    </li>
+                  )}
+                </ul>
+              )}
             </form>
           )}
         </div>

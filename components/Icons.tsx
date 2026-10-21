@@ -83,6 +83,12 @@ export const MailIcon = (p: SVGProps<SVGSVGElement>) => (
   </svg>
 )
 
+export const PhoneIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M5 4h3.5l1.8 4.5-2.2 1.4a11 11 0 005.9 5.9l1.4-2.2L20 15.5V19a1.5 1.5 0 01-1.6 1.5A15.5 15.5 0 013.5 5.6 1.5 1.5 0 015 4z" />
+  </svg>
+)
+
 export const MoonIcon = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}>
     <path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z" />

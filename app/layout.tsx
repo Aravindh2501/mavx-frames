@@ -54,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap"
         />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <JsonLd data={businessJsonLd} />
         <Suspense fallback={null}>
           <UIProvider>

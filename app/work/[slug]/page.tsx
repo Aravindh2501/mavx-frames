@@ -4,6 +4,7 @@ import JsonLd from '@/components/JsonLd'
 import { isConcept } from '@/lib/projectSeo'
 import { SITE_URL, absUrl, pageMetadata, IS_PREVIEW } from '@/lib/seo'
 import { getProject, getProjects } from '@/lib/store'
+import { getImageRatios } from '@/lib/imageSize'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,6 +30,7 @@ export default async function ProjectPage({ params }: Props) {
   const index = projects.findIndex((p) => p.slug === slug)
   if (index === -1) notFound()
   const project = projects[index]
+  const ratios = await getImageRatios([project.cover, ...(project.photos.length ? project.photos : [])])
   const next = projects.length > 1 ? projects[(index + 1) % projects.length] : null
 
   return (
@@ -56,7 +58,7 @@ export default async function ProjectPage({ params }: Props) {
           }
         ]}
       />
-      <ProjectDetail project={project} next={next} />
+      <ProjectDetail project={project} next={next} ratios={ratios} />
     </main>
   )
 }

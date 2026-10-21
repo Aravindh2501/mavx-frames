@@ -11,7 +11,8 @@ import {
   cityDescription,
   cityPath,
   cityTitle,
-  getCity
+  getCity,
+  pageMetadata
 } from '@/lib/seo'
 
 export const dynamicParams = false
@@ -29,11 +30,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = cityTitle(c)
   const description = cityDescription(c)
   return {
-    title: { absolute: title },
-    description,
-    alternates: { canonical: cityPath(c.slug) },
-    openGraph: { type: 'website', title, description, url: cityPath(c.slug), images: [{ url: BRAND.ogImage }] },
-    twitter: { card: 'summary_large_image', title, description, images: [BRAND.ogImage] }
+    ...pageMetadata(title.replace(` | ${BRAND.name}`, ''), description, cityPath(c.slug)),
+    robots: { index: true, follow: true }
   }
 }
 

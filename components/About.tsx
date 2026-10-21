@@ -27,7 +27,7 @@ export default function About() {
         scrollTrigger: st
       })
       gsap.from('.about-line', {
-        yPercent: 115,
+        yPercent: 135,
         duration: 1.1,
         stagger: 0.12,
         ease: 'power4.out',
@@ -66,9 +66,9 @@ export default function About() {
         </div>
 
         <div className="min-w-0">
-          <h3 className="font-serif text-[clamp(2.25rem,6vw,5rem)] leading-[1] tracking-[-0.03em]">
+          <h3 className="font-serif text-[clamp(2.25rem,6vw,5rem)] leading-[1.08] tracking-[-0.03em]">
             {site.aboutHeading.map((line) => (
-              <span key={line} className="block overflow-hidden py-[0.05em]">
+              <span key={line} className="mask-line block">
                 <span className="about-line block">{line}</span>
               </span>
             ))}
