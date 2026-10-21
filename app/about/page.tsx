@@ -5,14 +5,10 @@ import Footer from '@/components/Footer'
 import Photo from '@/components/Photo'
 import ContactButton from '@/components/ContactButton'
 import JsonLd from '@/components/JsonLd'
-import { BRAND, SITE_URL } from '@/lib/seo'
+import { BRAND, SITE_URL, pageMetadata } from '@/lib/seo'
 import { site } from '@/lib/site'
 
-export const metadata: Metadata = {
-  title: 'About',
-  description: `About ${BRAND.name}, a ${BRAND.base} photographer for weddings, pre-wedding shoots, portraits and events across ${BRAND.region}.`,
-  alternates: { canonical: '/about' }
-}
+export const metadata = pageMetadata('About Aravindh & MAVX Frames', 'Meet Aravindh, founder of MAVX Frames. Photography and films in Chennai and Coimbatore, with shoots across Tamil Nadu.', '/about')
 
 export default function AboutPage() {
   return (
@@ -38,7 +34,7 @@ export default function AboutPage() {
         <div className="relative mt-8 aspect-[5/4] w-full overflow-hidden bg-line sm:aspect-[4/3] md:mt-12">
           <Photo
             src={site.aboutImage}
-            alt={`${BRAND.name} photographer in ${BRAND.base}`}
+            alt="Wedding detail concept from the MAVX Frames visual collection"
             priority
             sizes="(min-width:768px) 680px, 100vw"
             className="object-cover"
@@ -52,6 +48,10 @@ export default function AboutPage() {
           {BRAND.region}.
         </p>
 
+        <h2 className="mt-10 font-serif text-3xl">A little direction. Space to be yourself.</h2>
+        <p className="mt-4 text-base leading-relaxed text-mute">A good photograph starts with feeling comfortable. Tell us what you love, what you want to remember and what feels like you. That conversation shapes the shoot.</p>
+        <h2 className="mt-10 font-serif text-3xl">Clear plans, from the start.</h2>
+        <p className="mt-4 text-base leading-relaxed text-mute">Before booking, we discuss the coverage, location, final deliverables and delivery schedule. You can bring a detailed brief or just an idea.</p>
         <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-line pt-8 md:mt-12">
           <ContactButton label="Let’s talk" />
           <Link href="/work" className="btn-ghost inline-flex min-h-[44px] items-center">

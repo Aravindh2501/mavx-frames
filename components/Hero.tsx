@@ -1,37 +1,86 @@
-// components/Hero.tsx
 'use client'
 
-import { useRef } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useGSAP } from '@gsap/react'
+import { useMemo, useRef } from 'react'
+import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap'
+import { clampRatio, useImageRatios } from '@/lib/imageRatio'
 import Photo from './Photo'
 import { BRAND } from '@/lib/seo'
 
-gsap.registerPlugin(useGSAP, ScrollTrigger)
-
 interface Props {
-  images: { wide: string; portrait: string; small: string }
+  pool: string[]
 }
 
-export default function Hero({ images }: Props) {
+type Slot = 'portrait' | 'small' | 'wide'
+
+const SLOT_RANGE: Record<Slot, [number, number]> = {
+  portrait: [0.62, 0.88],
+  small: [1.2, 1.7],
+  wide: [1.3, 1.9]
+}
+
+const SLOT_FALLBACK: Record<Slot, number> = { portrait: 0.7, small: 1.4, wide: 1.5 }
+
+function pickImages(pool: string[], ratios: Record<string, number>) {
+  const used = new Set<string>()
+  const take = (test: (ratio: number) => boolean) => {
+    const hit =
+      pool.find((s) => !used.has(s) && ratios[s] !== undefined && test(ratios[s])) ??
+      pool.find((s) => !used.has(s)) ??
+      pool[0]
+    if (hit) used.add(hit)
+    return hit ?? ''
+  }
+  return {
+    portrait: take((r) => r <= 0.9),
+    small: take((r) => r >= 1.12),
+    wide: take((r) => r >= 1.12)
+  }
+}
+
+export default function Hero({ pool }: Props) {
   const root = useRef<HTMLElement>(null)
+  const { ratios, ready } = useImageRatios(pool, 1800)
+  const picks = useMemo(() => pickImages(pool, ratios), [pool, ratios])
+
+  const ratioFor = (slot: Slot) => {
+    const known = ratios[picks[slot]]
+    if (known === undefined) return SLOT_FALLBACK[slot]
+    const [min, max] = SLOT_RANGE[slot]
+    return clampRatio(known, min, max)
+  }
 
   useGSAP(
     () => {
-      const tl = gsap.timeline({ defaults: { ease: 'power4.out' } })
-      tl.from('.hero-line', { yPercent: 118, duration: 1.3, stagger: 0.14 }, 0.15)
-        .from('.hero-sub', { autoAlpha: 0, y: 22, duration: 1 }, 1.05)
-        .fromTo(
-          '.hero-frame',
-          { clipPath: 'inset(100% 0% 0% 0%)' },
-          { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.6, stagger: 0.18, ease: 'expo.out' },
-          0.2
-        )
-        .from('.hero-frame img', { scale: 1.35, duration: 2.2, stagger: 0.18, ease: 'expo.out' }, 0.2)
+      if (prefersReducedMotion()) return
+      gsap
+        .timeline({ defaults: { ease: 'power4.out' } })
+        .from('.hero-line', { yPercent: 118, duration: 1.3, stagger: 0.14 }, 0.15)
     },
     { scope: root }
   )
+
+  useGSAP(
+    () => {
+      if (!ready) return
+      if (prefersReducedMotion()) {
+        gsap.set('.hero-frame', { clipPath: 'inset(0% 0% 0% 0%)' })
+        return
+      }
+      gsap
+        .timeline({ defaults: { ease: 'expo.out' } })
+        .fromTo(
+          '.hero-frame',
+          { clipPath: 'inset(100% 0% 0% 0%)' },
+          { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.6, stagger: 0.18 },
+          0
+        )
+        .from('.hero-frame img', { scale: 1.35, duration: 2.2, stagger: 0.18 }, 0)
+    },
+    { scope: root, dependencies: [ready] }
+  )
+
+  const frame = 'hero-frame relative overflow-hidden shadow-[0_24px_60px_-24px_rgba(20,18,17,0.35)]'
+  const hidden = undefined
 
   return (
     <section ref={root} className="relative pt-24 sm:pt-28 md:pt-32">
@@ -39,33 +88,54 @@ export default function Hero({ images }: Props) {
         <div className="home-hero-grid">
           <div className="home-hero-copy">
             <h1 className="font-serif text-[clamp(2.9rem,7.2vw,6.5rem)] leading-[1.02] tracking-[-0.07em]">
-              <span className="sr-only">{BRAND.name} — wedding and event photographer in Chennai, travelling across Tamil Nadu. </span>
               <span className="block overflow-hidden py-[0.06em]">
-                <span className="hero-line block">The art</span>
+                <span className="hero-line block">Your story.</span>
               </span>
               <span className="block overflow-hidden py-[0.02em]">
-                <span className="hero-line block">of</span>
+                <span className="hero-line block">Every</span>
               </span>
               <span className="block overflow-hidden py-[0.06em]">
-                <span className="hero-line block text-accent">noticing.</span>
+                <span className="hero-line block text-accent">frame.</span>
               </span>
             </h1>
+            <p className="mt-6 max-w-md text-base leading-relaxed text-mute">Wedding, portrait and brand photography. Films that bring you back. Based in Chennai and Coimbatore, travelling across Tamil Nadu.</p>
           </div>
 
           <div className="home-hero-media">
             <div className="home-hero-portrait">
-              <div className="hero-frame relative aspect-[4/5] overflow-hidden shadow-[0_24px_60px_-24px_rgba(20,18,17,0.35)] md:aspect-[0.55]">
-                <Photo src={images.portrait} alt={`Wedding portrait by ${BRAND.name}, photographer in Chennai`} priority sizes="(min-width:768px) 28vw, 100vw" className="object-cover" />
+              <div
+                className={`${frame} mx-auto w-[76%] md:w-full`}
+                style={{ aspectRatio: ratioFor('portrait'), visibility: hidden }}
+              >
+                <Photo
+                  src={picks.portrait}
+                  alt={`Selected image from the ${BRAND.name} portfolio`}
+                  priority
+                  sizes="(min-width:768px) 28vw, 76vw"
+                  className="object-cover"
+                />
               </div>
             </div>
             <div className="home-hero-small">
-              <div className="hero-frame relative aspect-[4/3] overflow-hidden shadow-[0_24px_60px_-24px_rgba(20,18,17,0.35)] md:aspect-[1.4]">
-                <Photo src={images.small} alt={`Candid wedding moment photographed by ${BRAND.name} in Tamil Nadu`} priority sizes="(min-width:768px) 23vw, 50vw" className="object-cover" />
+              <div className={frame} style={{ aspectRatio: ratioFor('small'), visibility: hidden }}>
+                <Photo
+                  src={picks.small}
+                  alt={`Photography collection by ${BRAND.name}`}
+                  priority
+                  sizes="(min-width:768px) 23vw, 50vw"
+                  className="object-cover"
+                />
               </div>
             </div>
             <div className="home-hero-wide">
-              <div className="hero-frame relative aspect-[4/3] overflow-hidden shadow-[0_24px_60px_-24px_rgba(20,18,17,0.35)] md:aspect-[2.5]">
-                <Photo src={images.wide} alt={`Wedding photography in Chennai and Coimbatore by ${BRAND.name}`} priority sizes="(min-width:768px) 40vw, 50vw" className="object-cover" />
+              <div className={frame} style={{ aspectRatio: ratioFor('wide'), visibility: hidden }}>
+                <Photo
+                  src={picks.wide}
+                  alt={`Featured image from ${BRAND.name}`}
+                  priority
+                  sizes="(min-width:768px) 40vw, 50vw"
+                  className="object-cover"
+                />
               </div>
             </div>
           </div>

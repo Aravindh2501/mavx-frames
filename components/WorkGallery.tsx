@@ -1,10 +1,12 @@
 'use client'
 
+import { isConcept, projectAlt } from '@/lib/projectSeo'
+
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import gsap from 'gsap'
-import { useGSAP } from '@gsap/react'
+import { gsap, Flip, useGSAP, prefersReducedMotion } from '@/lib/gsap'
+import { clampRatio, useImageRatios } from '@/lib/imageRatio'
 import Photo from './Photo'
 import Reel from './Reel'
 import { PencilIcon, PlusIcon } from './Icons'
@@ -12,26 +14,21 @@ import { useUI } from './UIProvider'
 import { CATEGORIES } from '@/lib/types'
 import type { Project } from '@/lib/types'
 
-gsap.registerPlugin(useGSAP)
-
-const RATIOS = ['4 / 5', '1 / 1', '4 / 3', '3 / 4', '5 / 4', '2 / 3']
-
 export default function WorkGallery({ projects }: { projects: Project[] }) {
   const { isEdit, href, openEditor } = useUI()
   const params = useSearchParams()
   const root = useRef<HTMLElement>(null)
   const tabsRow = useRef<HTMLDivElement>(null)
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
+  const flipState = useRef<Flip.FlipState | null>(null)
 
   const tabs = useMemo(() => {
     const cats = Array.from(new Set([...CATEGORIES, ...projects.map((p) => p.category)]))
-    return [{ key: 'All' }, ...cats.map((key) => ({ key })), { key: 'Reels' }]
+    return ['All', ...cats, 'Reels']
   }, [projects])
 
   const initial = params.get('type')
-  const [active, setActive] = useState(
-    initial && tabs.some((t) => t.key === initial) ? initial : 'All'
-  )
+  const [active, setActive] = useState(initial && tabs.includes(initial) ? initial : 'All')
 
   const items = useMemo(
     () => (active === 'All' ? projects : projects.filter((p) => p.category === active)),
@@ -43,7 +40,13 @@ export default function WorkGallery({ projects }: { projects: Project[] }) {
     [projects]
   )
 
+  const { ratioOf, ready } = useImageRatios(useMemo(() => projects.map((p) => p.cover), [projects]))
+
   const select = (key: string) => {
+    if (key === active) return
+    if (root.current && !prefersReducedMotion()) {
+      flipState.current = Flip.getState(root.current.querySelectorAll('.wg-item'))
+    }
     setActive(key)
     const url = new URL(window.location.href)
     if (key === 'All') url.searchParams.delete('type')
@@ -55,8 +58,8 @@ export default function WorkGallery({ projects }: { projects: Project[] }) {
     const el = tabRefs.current[active]
     const row = tabsRow.current
     if (!el || !row) return
-    const target = el.offsetLeft - row.clientWidth / 2 + el.offsetWidth / 2
-    row.scrollTo({ left: target, behavior: animate ? 'smooth' : 'auto' })
+    const left = el.offsetLeft - row.clientWidth / 2 + el.offsetWidth / 2
+    row.scrollTo({ left, behavior: animate ? 'smooth' : 'auto' })
   }
 
   useEffect(() => {
@@ -72,57 +75,71 @@ export default function WorkGallery({ projects }: { projects: Project[] }) {
 
   useGSAP(
     () => {
-      gsap.fromTo(
-        '.wg-item',
-        { y: 50, autoAlpha: 0 },
-        { y: 0, autoAlpha: 1, duration: 0.8, stagger: 0.07, ease: 'power3.out' }
-      )
+      gsap.from('.wg-head > *', { y: 40, autoAlpha: 0, duration: 1.1, stagger: 0.12, ease: 'power3.out' })
     },
-    { scope: root, dependencies: [active, items.length] }
+    { scope: root }
   )
 
   useGSAP(
     () => {
-      gsap.from('.wg-head', { y: 40, autoAlpha: 0, duration: 1, ease: 'power3.out' })
+      const targets = gsap.utils.toArray<HTMLElement>('.wg-item')
+      const state = flipState.current
+      flipState.current = null
+
+      if (!targets.length || prefersReducedMotion()) {
+        gsap.set(targets, { autoAlpha: 1, y: 0 })
+        return
+      }
+
+      if (state && state.targets.length) {
+        Flip.from(state, {
+          targets,
+          duration: 0.9,
+          ease: 'silk',
+          stagger: 0.03,
+          onEnter: (entering) =>
+            gsap.fromTo(
+              entering,
+              { autoAlpha: 0, y: 50 },
+              { autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.07, ease: 'power3.out' }
+            )
+        })
+        return
+      }
+
+      gsap.fromTo(
+        targets,
+        { y: 50, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.9, stagger: 0.07, ease: 'power3.out' }
+      )
     },
-    { scope: root }
+    { scope: root, dependencies: [active, items.length, ready] }
   )
 
   return (
     <section ref={root} className="mx-auto max-w-[1280px] px-6 pb-24 pt-20 md:px-10 md:pt-28">
       <div className="wg-head flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h2 className="font-serif text-[clamp(2.4rem,5.5vw,4.5rem)] leading-none tracking-[-0.03em]">
-            Every story, <span className="italic text-accent">told.</span>
-          </h2>
-          
-        </div>
-        <p className="max-w-xs text-sm leading-relaxed text-mute">
-          Choose a type of work below. Weddings, portraits, commercial and more, each told with the same
-          eye for the quiet moments.
-        </p>
+        <h2 className="font-serif text-[clamp(2.4rem,5.5vw,4.5rem)] leading-none tracking-[-0.03em]">
+          Every story, <span className="italic text-accent">told.</span>
+        </h2>
+        <p className="max-w-xs text-sm leading-relaxed text-mute">Pick a category to explore.</p>
       </div>
 
-      <div
-        className="sticky top-[3.6rem] z-30 -mx-6 mt-10 bg-paper/85 px-6 py-3 backdrop-blur-md md:-mx-10 md:px-10"
-      >
-        <div
-          ref={tabsRow}
-          className="no-scrollbar relative flex gap-1 overflow-x-auto pb-3"
-        >
-          {tabs.map((t) => (
+      <div className="sticky top-[3.6rem] z-30 -mx-6 mt-10 bg-paper/85 px-6 py-3 backdrop-blur-md md:-mx-10 md:px-10">
+        <div ref={tabsRow} className="no-scrollbar relative flex gap-1 overflow-x-auto pb-3">
+          {tabs.map((key) => (
             <button
-              key={t.key}
+              key={key}
               ref={(el) => {
-                tabRefs.current[t.key] = el
+                tabRefs.current[key] = el
               }}
-              onClick={() => select(t.key)}
-              aria-pressed={active === t.key}
+              onClick={() => select(key)}
+              aria-pressed={active === key}
               className={`work-tab relative z-10 flex shrink-0 items-center gap-1.5 text-sm transition-colors duration-300 ${
-                active === t.key ? 'text-accent font-semibold' : 'text-ink/70 hover:text-ink'
+                active === key ? 'font-semibold text-accent' : 'text-ink/70 hover:text-ink'
               }`}
             >
-              {t.key}
+              {key}
             </button>
           ))}
         </div>
@@ -150,18 +167,22 @@ export default function WorkGallery({ projects }: { projects: Project[] }) {
           )
         ) : items.length ? (
           <div className="columns-1 gap-5 sm:columns-2 lg:columns-3">
-            {items.map((p, i) => (
-              <article key={p.id} className="wg-item group relative mb-8 break-inside-avoid">
+            {items.map((p) => (
+              <article
+                key={p.id}
+                data-flip-id={p.id}
+                className="wg-item group relative mb-8 break-inside-avoid"
+              >
                 <Link href={href(`/work/${p.slug}`)} className="block">
                   <div
                     className="relative overflow-hidden bg-line"
-                    style={{ aspectRatio: RATIOS[i % RATIOS.length] }}
+                    style={{ aspectRatio: clampRatio(ratioOf(p.cover), 0.66, 1.8) }}
                   >
                     <Photo
                       src={p.cover}
-                      alt={p.title}
+                      alt={projectAlt(p)}
                       sizes="(min-width:1024px) 33vw, (min-width:640px) 50vw, 100vw"
-                      className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.06]"
+                      className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.04]"
                     />
                     <span className="absolute left-3 top-3 rounded-full bg-paper/90 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-ink">
                       {p.category}
@@ -176,7 +197,7 @@ export default function WorkGallery({ projects }: { projects: Project[] }) {
                     <h3 className="font-serif text-xl leading-tight transition-colors group-hover:text-accent">
                       {p.title}
                     </h3>
-                    <span className="eyebrow shrink-0">{p.location}</span>
+                    <span className="text-xs text-mute">{isConcept(p) ? 'AI-generated concept' : p.location}</span>
                   </div>
                 </Link>
                 {isEdit && (

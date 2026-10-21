@@ -1,0 +1,19 @@
+export const services = [
+  { id: 'weddings', title: 'Weddings & engagements', text: 'The rituals, the reunions and the moments between. Photography that keeps the feeling of your celebration.', details: 'Tell us which ceremonies you want covered, your venues and the hours you need. Mention family portraits, important rituals and any moments you do not want missed.' },
+  { id: 'couples', title: 'Pre-wedding & couple shoots', text: 'A little time together. A place you love. Photographs that feel like the two of you.', details: 'Share your preferred setting, outfit ideas and date. We can discuss the light, location access and a comfortable pace before the shoot.' },
+  { id: 'portraits', title: 'Portraits & maternity', text: 'Come as you are. Personal portraits, family photographs and milestones worth keeping.', details: 'Whether you are planning a personal portrait or a family session, tell us who will be there and where you feel comfortable. Share any reference images and accessibility needs.' },
+  { id: 'events', title: 'Events & celebrations', text: 'The people who showed up. The energy in the room. The details you worked so hard on.', details: 'Send the event schedule, venue, guest count and intended use of the photographs. Include key speakers, group photographs and any time-sensitive moments.' },
+  { id: 'brands', title: 'Brands, products & fashion', text: 'Show what makes your work yours. Thoughtful images for products, people and the brands behind them.', details: 'Tell us what you are promoting and where the images will appear. Product count, styling, backgrounds and usage needs help us scope the shoot clearly.' },
+  { id: 'films', title: 'Films & reels', text: 'Movement, atmosphere and a story worth watching. Video shaped around your occasion or brand.', details: 'Share the platform, preferred duration and the story you want to tell. Ask about photography and video coverage together, and agree on formats and deliverables before booking.' }
+]
+
+export const faqs = [
+  { q: 'Where is MAVX Frames based?', a: 'MAVX Frames is based in Chennai and Coimbatore. We take photography and videography enquiries across Tamil Nadu. Share your venue and date so we can confirm availability and travel.' },
+  { q: 'What kinds of shoots can I book?', a: 'You can enquire about weddings, engagements, pre-wedding shoots, portraits, maternity sessions, events, commercial photography, fashion, films and reels.' },
+  { q: 'How much does a shoot cost?', a: 'The quote depends on the shoot type, coverage hours, location and final deliverables. Send your date, venue and requirements for a quote that matches your plans.' },
+  { q: 'How do I check availability?', a: 'Use the enquiry form to share your name, phone or email, shoot type, date and venue. We will review your plans and contact you. An enquiry alone does not confirm a booking.' },
+  { q: 'Do you travel outside Chennai and Coimbatore?', a: 'Yes. We cover shoots across Tamil Nadu. Tell us the exact location so travel, accommodation where needed and any venue requirements can be discussed before booking.' },
+  { q: 'Can you help me plan a pre-wedding location?', a: 'Share the look you like: a beach, greenery, city streets or a private venue. We can discuss suitable options. Access, photography permissions and any venue fees must be checked before the shoot.' },
+  { q: 'When will I receive the photographs or films?', a: 'Delivery depends on the coverage and editing agreed for your shoot. Ask for the delivery schedule, image selection process, file formats and any album or video inclusions in your written quote.' },
+  { q: 'What should I send with my enquiry?', a: 'Send your preferred date, city, venue, shoot type, approximate coverage hours and any reference images. If you have a budget or a delivery deadline, include that too.' }
+]

@@ -1,14 +1,21 @@
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.mavxframes.com').replace(/\/$/, '')
+import type { Metadata } from 'next'
+
+// Set this to the final production origin before deploying (including www if used).
+const origin = new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.mavxframes.com')
+if (!['https:', 'http:'].includes(origin.protocol)) throw new Error('NEXT_PUBLIC_SITE_URL must be an HTTP(S) URL')
+export const SITE_URL = origin.origin
+export const IS_PREVIEW = process.env.VERCEL_ENV === 'preview'
+
 
 export const BRAND = {
   name: 'MAVX Frames',
-  base: 'Chennai',
+  base: 'Chennai and Coimbatore',
   region: 'Tamil Nadu',
-  tagline: 'Wedding, pre-wedding and event photography in Chennai, travelling across Tamil Nadu',
+  tagline: 'Your moments. Beautifully kept.',
   description:
-    'MAVX Frames is a Chennai photographer for weddings, pre-wedding shoots, engagements, portraits and events. We travel to Coimbatore, Madurai, Trichy, Thanjavur, Pondicherry, Vellore and cities across Tamil Nadu.',
-  geo: { lat: 13.0827, lng: 80.2707 },
-  ogImage: '/images/a-love-quietly-told.png'
+    'Wedding, portrait and brand photography in Chennai and Coimbatore. MAVX Frames creates photographs and films across Tamil Nadu. Enquire about your shoot.',
+  ogImage: '/opengraph-image',
+  logo: '/logo.png'
 }
 
 export type City = {
@@ -302,10 +309,17 @@ export const cityTitle = (c: City) =>
     : `Wedding & Pre-Wedding Photographer in ${c.name.split(' (')[0]} | ${BRAND.name}`
 
 export const cityDescription = (c: City) => {
-  const n = c.name.split(' (')[0]
-  return c.slug === 'chennai'
-    ? `${BRAND.name} is a Chennai wedding, pre-wedding and portrait photographer. Candid, natural stories at temples, beaches and banquet halls across the city.`
-    : `Looking for a photographer in ${n}? ${BRAND.name} travels from Chennai for weddings, pre-wedding shoots and portraits in ${n}, ${hoursLabel(c.hours)}.`
+  const name = c.name.split(' (')[0]
+  return `Wedding, pre-wedding and portrait photography in ${name} by MAVX Frames. Based in Chennai and Coimbatore, serving Tamil Nadu. Check your date.`
 }
 
-export const absUrl = (path: string) => (path.startsWith('http') ? path : `${SITE_URL}${path.startsWith('/') ? '' : '/'}${path}`)
+export const absUrl = (path: string) => new URL(path, `${SITE_URL}/`).href
+
+export function pageMetadata(title: string, description: string, path: string, image = BRAND.ogImage): Metadata {
+  const fullTitle = `${title} | ${BRAND.name}`
+  return {
+    title: { absolute: fullTitle }, description, alternates: { canonical: absUrl(path) },
+    openGraph: { type: 'website', locale: 'en_IN', siteName: BRAND.name, title: fullTitle, description, url: absUrl(path), images: [{ url: absUrl(image), alt: fullTitle }] },
+    twitter: { card: 'summary_large_image', title: fullTitle, description, images: [absUrl(image)] }
+  }
+}

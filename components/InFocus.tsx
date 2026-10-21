@@ -1,22 +1,41 @@
 'use client'
 
+import { isConcept, projectAlt } from '@/lib/projectSeo'
+
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useGSAP } from '@gsap/react'
+import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/gsap'
+import { clampRatio, useImageRatios } from '@/lib/imageRatio'
 import Photo from './Photo'
 import { PencilIcon, PlusIcon } from './Icons'
 import { useUI } from './UIProvider'
 import type { Project } from '@/lib/types'
 
-gsap.registerPlugin(useGSAP, ScrollTrigger)
+const frameRatio = (project: Project, ratio: number) =>
+  project.shape === 'circle' ? 1 : clampRatio(ratio, 0.6, 1.9)
+
+const frameStyle = (project: Project) => ({
+  borderRadius:
+    project.shape === 'arch'
+      ? '999px 999px 0 0'
+      : project.shape === 'circle' || project.shape === 'pill'
+        ? '999px'
+        : undefined,
+  clipPath:
+    project.shape === 'slant'
+      ? 'polygon(0 7%,100% 0,100% 93%,0 100%)'
+      : project.shape === 'triangle'
+        ? 'polygon(50% 0,100% 100%,0 100%)'
+        : undefined
+})
 
 export default function InFocus({ projects }: { projects: Project[] }) {
   const { isEdit, href, openEditor, openContact } = useUI()
   const root = useRef<HTMLElement>(null)
   const pin = useRef<HTMLDivElement>(null)
   const track = useRef<HTMLDivElement>(null)
+  const { ratios, ratioOf, ready } = useImageRatios(projects.map((p) => p.cover))
+  const known = Object.keys(ratios).length
 
   useEffect(() => {
     document.fonts?.ready.then(() => ScrollTrigger.refresh())
@@ -28,9 +47,17 @@ export default function InFocus({ projects }: { projects: Project[] }) {
       const pinEl = pin.current
       if (!trackEl || !pinEl) return
 
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        pinEl.style.height = 'auto'; trackEl.style.position = 'relative'; trackEl.style.width = '100%'; trackEl.style.flexWrap = 'wrap';
-        return () => { pinEl.style.height = ''; trackEl.style.position = ''; trackEl.style.width = ''; trackEl.style.flexWrap = '' }
+      if (prefersReducedMotion()) {
+        pinEl.style.height = 'auto'
+        trackEl.style.position = 'relative'
+        trackEl.style.width = '100%'
+        trackEl.style.flexWrap = 'wrap'
+        return () => {
+          pinEl.style.height = ''
+          trackEl.style.position = ''
+          trackEl.style.width = ''
+          trackEl.style.flexWrap = ''
+        }
       }
 
       const dist = () => Math.max(0, trackEl.scrollWidth - window.innerWidth)
@@ -43,7 +70,6 @@ export default function InFocus({ projects }: { projects: Project[] }) {
           start: 'top top',
           end: () => `+=${dist() * 0.85}`,
           pin: true,
-          // Lenis already smooths the scroll — extra scrub lag here made it feel slow
           scrub: true,
           anticipatePin: 1,
           invalidateOnRefresh: true
@@ -55,9 +81,9 @@ export default function InFocus({ projects }: { projects: Project[] }) {
         if (img) {
           gsap.fromTo(
             img,
-            { xPercent: -7, scale: 0.96 },
+            { xPercent: -1.8, scale: 1.01 },
             {
-              xPercent: 7,
+              xPercent: 1.8,
               scale: 1,
               ease: 'none',
               scrollTrigger: {
@@ -84,25 +110,25 @@ export default function InFocus({ projects }: { projects: Project[] }) {
         })
       })
 
-      gsap.from('.focus-head', {
+      gsap.from('.focus-head > *', {
         y: 40,
         autoAlpha: 0,
-        duration: 1,
+        duration: 1.1,
+        stagger: 0.12,
         ease: 'power3.out',
         scrollTrigger: { trigger: root.current, start: 'top 80%' }
       })
+
+      ScrollTrigger.refresh()
     },
-    { scope: root, dependencies: [projects, isEdit], revertOnUpdate: true }
+    { scope: root, dependencies: [projects, isEdit, ready, known], revertOnUpdate: true }
   )
 
   return (
     <section id="in-focus" ref={root} className="relative">
       <div ref={pin} className="flex h-[100svh] flex-col overflow-hidden bg-paper pt-24 md:pt-28">
         <div className="focus-head flex items-end justify-between px-[6vw] pb-12">
-          <div>
-            <h2 className="font-serif text-4xl tracking-tight md:text-6xl">In Focus</h2>
-            
-          </div>
+          <h2 className="font-serif text-4xl tracking-tight md:text-6xl">In Focus</h2>
           <Link
             href={href('/work')}
             className="flex items-center gap-2 text-xs text-ink/80 transition-colors hover:text-accent"
@@ -111,23 +137,13 @@ export default function InFocus({ projects }: { projects: Project[] }) {
           </Link>
         </div>
 
-        <div
-          className="relative min-h-0 flex-1"
-          style={{ ['--track-h' as string]: 'clamp(280px, calc(100svh - 17.5rem), 640px)' }}
-        >
-          <div
-            ref={track}
-            className="gpu absolute inset-y-0 left-0 flex w-max items-stretch focus-track"
-          >
+        <div className="relative min-h-0 flex-1">
+          <div ref={track} className="gpu focus-track absolute inset-y-0 left-0 flex w-max items-stretch">
             {isEdit && (
-              <div className="focus-card flex shrink-0 self-center">
+              <div className="focus-card focus-card-aux flex shrink-0 self-center">
                 <button
                   onClick={() => openEditor(null)}
-                  className="flex flex-col items-center justify-center gap-3 rounded border border-dashed border-mute/60 text-mute transition-colors hover:border-ink hover:text-accent"
-                  style={{
-                    height: 'calc(var(--track-h) * 0.6)',
-                    width: 'calc(var(--track-h) * 0.45)'
-                  }}
+                  className="flex h-[clamp(170px,30svh,320px)] w-[clamp(130px,22svh,240px)] flex-col items-center justify-center gap-3 rounded border border-dashed border-mute/60 text-mute transition-colors hover:border-ink hover:text-accent"
                 >
                   <PlusIcon width={28} height={28} />
                   <span className="text-xs">New project</span>
@@ -135,61 +151,48 @@ export default function InFocus({ projects }: { projects: Project[] }) {
               </div>
             )}
 
-            {projects.map((p, i) => {
-              const width = '100%'
-              return (
-                <article
-                  key={p.id}
-                  className="focus-card group relative flex shrink-0 flex-col"
-                  style={{ alignSelf: i % 2 === 0 ? 'flex-end' : 'flex-start' }}
-                >
-                  <Link href={href(`/work/${p.slug}`)} className="block">
-                    <div
-                      className="focus-media relative overflow-hidden bg-line"
-                      style={{
-                        width,
-                        borderRadius: p.shape === 'arch' ? '999px 999px 0 0' : p.shape === 'circle' || p.shape === 'pill' ? '999px' : undefined,
-                        clipPath: p.shape === 'slant' ? 'polygon(0 7%,100% 0,100% 93%,0 100%)' : p.shape === 'triangle' ? 'polygon(50% 0,100% 100%,0 100%)' : undefined,
-                        
-                        
-                        
-                      }}
-                    >
-                      {/* GSAP moves .focus-img; hover zoom lives on the inner div so CSS
-                          transitions never fight the scroll-driven transform */}
-                      <div className="focus-img gpu absolute inset-y-0 -left-[9%] w-[118%]">
-                        <div className="relative h-full w-full transition-transform duration-[900ms] ease-out group-hover:scale-[1.05]">
-                          <Photo
-                            src={p.cover}
-                            alt={p.title}
-                            sizes="(min-width:768px) 40vw, 80vw"
-                            className="object-cover"
-                          />
-                        </div>
+            {projects.map((p, i) => (
+              <article
+                key={p.id}
+                className="focus-card group relative flex shrink-0 flex-col"
+                style={{ alignSelf: i % 2 === 0 ? 'flex-end' : 'flex-start' }}
+              >
+                <Link href={href(`/work/${p.slug}`)} className="block">
+                  <div
+                    className="focus-media relative overflow-hidden bg-line"
+                    style={{
+                      ['--r' as string]: frameRatio(p, ratioOf(p.cover)),
+                      ...frameStyle(p)
+                    }}
+                  >
+                    <div className="focus-img gpu absolute inset-y-0 -left-[2%] w-[104%]">
+                      <div className="relative h-full w-full transition-transform duration-[900ms] ease-out group-hover:scale-[1.04]">
+                        <Photo src={p.cover} alt={projectAlt(p)} sizes="(min-width:768px) 45vw, 84vw" className="object-cover" />
                       </div>
                     </div>
-                    <div className="mt-4 flex items-baseline justify-between gap-4">
-                      <div>
-                        <h3 className="font-serif text-lg leading-tight md:text-xl">{p.title}</h3>
-                        <p className="eyebrow mt-1.5">{p.location || p.category}</p>
-                      </div>
-                      <span className="eyebrow">{String(i + 1).padStart(2, '0')}</span>
+                  </div>
+                  <div className="mt-4 flex items-baseline justify-between gap-4">
+                    <div>
+                      <h3 className="font-serif text-lg leading-tight md:text-xl">{p.title}</h3>
+                      {isConcept(p) && <p className="mt-2 text-xs text-mute">AI-generated concept</p>}
+                      <p className="eyebrow mt-1.5">{p.location || p.category}</p>
                     </div>
-                  </Link>
-                  {isEdit && (
-                    <button
-                      onClick={() => openEditor(p)}
-                      aria-label="Edit project"
-                      className="absolute right-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-paper/95 text-ink shadow-md transition-colors hover:bg-ink hover:text-paper"
-                    >
-                      <PencilIcon width={16} height={16} />
-                    </button>
-                  )}
-                </article>
-              )
-            })}
+                    <span className="eyebrow">{String(i + 1).padStart(2, '0')}</span>
+                  </div>
+                </Link>
+                {isEdit && (
+                  <button
+                    onClick={() => openEditor(p)}
+                    aria-label="Edit project"
+                    className="absolute right-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-paper/95 text-ink shadow-md transition-colors hover:bg-ink hover:text-paper"
+                  >
+                    <PencilIcon width={16} height={16} />
+                  </button>
+                )}
+              </article>
+            ))}
 
-            <div className="focus-card flex shrink-0 flex-col justify-center gap-5 pl-[4vw]">
+            <div className="focus-card focus-card-aux flex shrink-0 flex-col justify-center gap-5 pl-[4vw]">
               <span className="eyebrow">Next chapter</span>
               <p className="max-w-[18rem] font-serif text-3xl leading-tight tracking-tight">
                 Yours could be <span className="italic text-accent">the next story.</span>

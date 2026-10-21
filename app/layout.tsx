@@ -5,73 +5,35 @@ import UIProvider from '@/components/UIProvider'
 import Navbar from '@/components/Navbar'
 import SmoothScroll from '@/components/SmoothScroll'
 import JsonLd from '@/components/JsonLd'
-import { BRAND, CITIES, SITE_URL, cityPath } from '@/lib/seo'
+import { BRAND, SITE_URL, IS_PREVIEW, absUrl } from '@/lib/seo'
 import { site } from '@/lib/site'
-
-const TITLE = 'MAVX Frames — Wedding & Pre-Wedding Photographer in Chennai, Tamil Nadu'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: TITLE, template: '%s | MAVX Frames' },
+  title: { default: `${BRAND.name} | Photography in Chennai & Coimbatore`, template: `%s | ${BRAND.name}` },
   description: BRAND.description,
   applicationName: BRAND.name,
-  keywords: [
-    'wedding photographer in Chennai',
-    'pre wedding photographer Chennai',
-    'candid wedding photography Tamil Nadu',
-    'wedding photographer Coimbatore',
-    'wedding photographer Madurai',
-    'wedding photographer Trichy',
-    'wedding photographer Thanjavur',
-    'wedding photographer Pondicherry',
-    'wedding photographer Vellore',
-    'wedding photographer Cuddalore',
-    'photographer Chennai'
-  ],
-  alternates: { canonical: '/' },
-  openGraph: {
-    type: 'website',
-    locale: 'en_IN',
-    url: '/',
-    siteName: BRAND.name,
-    title: TITLE,
-    description: BRAND.description,
-    images: [{ url: BRAND.ogImage, alt: 'MAVX Frames wedding photography in Chennai' }]
-  },
-  twitter: { card: 'summary_large_image', title: TITLE, description: BRAND.description, images: [BRAND.ogImage] },
-  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 } },
-  other: {
-    'geo.region': 'IN-TN',
-    'geo.placename': 'Chennai',
-    'geo.position': `${BRAND.geo.lat};${BRAND.geo.lng}`,
-    ICBM: `${BRAND.geo.lat}, ${BRAND.geo.lng}`
-  }
+  icons: { icon: BRAND.logo, apple: BRAND.logo },
+  verification: { google: process.env.GOOGLE_SITE_VERIFICATION || undefined, other: process.env.BING_SITE_VERIFICATION ? { 'msvalidate.01': process.env.BING_SITE_VERIFICATION } : undefined },
+  robots: { index: !IS_PREVIEW, follow: true, googleBot: { index: !IS_PREVIEW, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 } }
 }
 
 const businessJsonLd = [
   {
-    '@context': 'https://schema.org',
-    '@type': ['ProfessionalService', 'LocalBusiness'],
-    '@id': `${SITE_URL}/#business`,
-    name: BRAND.name,
-    url: SITE_URL,
-    description: BRAND.description,
-    image: `${SITE_URL}${BRAND.ogImage}`,
-    priceRange: '₹₹',
-    address: { '@type': 'PostalAddress', addressLocality: 'Chennai', addressRegion: 'Tamil Nadu', addressCountry: 'IN' },
-    geo: { '@type': 'GeoCoordinates', latitude: BRAND.geo.lat, longitude: BRAND.geo.lng },
-    areaServed: CITIES.map((c) => ({ '@type': 'City', name: c.name.split(' (')[0], url: `${SITE_URL}${cityPath(c.slug)}` })),
-    knowsAbout: ['Wedding photography', 'Pre-wedding photography', 'Portrait photography', 'Event photography'],
+    '@context': 'https://schema.org', '@type': 'Organization',
+    '@id': `${SITE_URL}/#business`, name: BRAND.name, url: SITE_URL,
+    description: BRAND.description, logo: absUrl(BRAND.logo),
+    founder: { '@type': 'Person', name: 'Aravindh' },
+    location: ['Chennai', 'Coimbatore'].map(name => ({ '@type': 'City', name })),
+    areaServed: [{ '@type': 'State', name: 'Tamil Nadu' }, { '@type': 'City', name: 'Puducherry' }],
+    email: site.email ? site.email.replace('mailto:', '') : undefined,
+    telephone: site.phone || undefined,
     sameAs: [site.instagram, site.youtube].filter(Boolean)
   },
   {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    '@id': `${SITE_URL}/#website`,
-    url: SITE_URL,
-    name: BRAND.name,
-    inLanguage: 'en-IN',
-    publisher: { '@id': `${SITE_URL}/#business` }
+    '@context': 'https://schema.org', '@type': 'WebSite',
+    '@id': `${SITE_URL}/#website`, url: SITE_URL, name: BRAND.name,
+    inLanguage: 'en-IN', publisher: { '@id': `${SITE_URL}/#business` }
   }
 ]
 

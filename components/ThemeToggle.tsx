@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
+import { gsap, prefersReducedMotion } from '@/lib/gsap'
 import { MoonIcon, SunIcon } from './Icons'
 
 export default function ThemeToggle() {
@@ -30,11 +30,11 @@ export default function ThemeToggle() {
       localStorage.setItem('theme', next ? 'dark' : 'light')
     } catch {}
     setDark(next)
-    if (icon.current && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (icon.current && !prefersReducedMotion()) {
       gsap.fromTo(
         icon.current,
         { rotate: -70, scale: 0.6, opacity: 0 },
-        { rotate: 0, scale: 1, opacity: 1, duration: 0.6, ease: 'power3.out', clearProps: 'all' }
+        { rotate: 0, scale: 1, opacity: 1, duration: 0.7, ease: 'silk', clearProps: 'all' }
       )
     }
   }

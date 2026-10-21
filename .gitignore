@@ -1,6 +1,6 @@
-node_modules
-.next
-.env
-.env.local
+node_modules/
+.next/
+.env*
+!.env.example
+*.tsbuildinfo
 data/enquiries.json
-next-env.d.ts

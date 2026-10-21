@@ -1,33 +1,14 @@
 import type { MetadataRoute } from 'next'
-import { CITIES, SITE_URL, cityPath } from '@/lib/seo'
+import { CITIES, absUrl, cityPath, IS_PREVIEW } from '@/lib/seo'
+import { isConcept } from '@/lib/projectSeo'
 import { getProjects } from '@/lib/store'
-
 export const dynamic = 'force-dynamic'
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date()
-  let projects: Awaited<ReturnType<typeof getProjects>> = []
-  try {
-    projects = await getProjects()
-  } catch {
-    projects = []
-  }
-
+  if (IS_PREVIEW) return []
+  const projects = await getProjects()
   return [
-    { url: `${SITE_URL}/`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
-    { url: `${SITE_URL}/work`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${SITE_URL}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    ...CITIES.map((c) => ({
-      url: `${SITE_URL}${cityPath(c.slug)}`,
-      lastModified: now,
-      changeFrequency: 'monthly' as const,
-      priority: c.slug === 'chennai' || c.slug === 'coimbatore' ? 0.9 : 0.7
-    })),
-    ...projects.map((p) => ({
-      url: `${SITE_URL}/work/${p.slug}`,
-      lastModified: now,
-      changeFrequency: 'monthly' as const,
-      priority: 0.6
-    }))
+    ...['/', '/about', '/work', '/services', '/faq', '/contact'].map(path => ({ url: absUrl(path) })),
+    ...CITIES.map(c => ({ url: absUrl(cityPath(c.slug)) })),
+    ...projects.filter(p => !isConcept(p)).map(p => ({ url: absUrl(`/work/${p.slug}`), images: Array.from(new Set([p.cover, ...p.photos])).filter(Boolean).map(absUrl) }))
   ]
 }

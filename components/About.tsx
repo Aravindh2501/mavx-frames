@@ -1,22 +1,18 @@
-// components/About.tsx
 'use client'
 
 import { useRef } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useGSAP } from '@gsap/react'
+import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap'
 import Link from 'next/link'
 import Photo from './Photo'
 import { site } from '@/lib/site'
 import { BRAND } from '@/lib/seo'
-
-gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 export default function About() {
   const root = useRef<HTMLElement>(null)
 
   useGSAP(
     () => {
+      if (prefersReducedMotion()) return
       const st = { trigger: root.current, start: 'top 70%' }
       gsap.from('.about-label', { autoAlpha: 0, y: 20, duration: 0.8, scrollTrigger: st })
       gsap.fromTo(
@@ -63,7 +59,7 @@ export default function About() {
         <div className="about-frame relative mx-auto aspect-[1/1.05] w-full max-w-md overflow-hidden bg-line lg:ml-[12%] lg:max-w-none">
           <Photo
             src={site.aboutImage}
-            alt={BRAND.name}
+            alt="Wedding detail concept from the MAVX Frames visual collection"
             sizes="(min-width:1024px) 30vw, (min-width:448px) 448px, 100vw"
             className="object-cover"
           />

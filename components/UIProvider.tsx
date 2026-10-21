@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { createContext, Suspense, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import ContactModal from './ContactModal'
 import ProjectModal from './ProjectModal'
@@ -21,11 +21,19 @@ export function useUI() {
   return ctx
 }
 
-export default function UIProvider({ children }: { children: React.ReactNode }) {
+// Keep query-dependent owner controls inside a small boundary so public content
+// is present in static HTML even before hydration.
+function EditModeReader({ onChange }: { onChange: (value: boolean) => void }) {
   const params = useSearchParams()
+  const edit = params.get('edit') === 'true'
+  useEffect(() => onChange(edit), [edit, onChange])
+  return null
+}
+
+export default function UIProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
-  const isEdit = params.get('edit') === 'true'
+  const [isEdit, setIsEdit] = useState(false)
 
   const [contactOpen, setContactOpen] = useState(false)
   const [editor, setEditor] = useState<{ open: boolean; project: Project | null }>({
@@ -52,6 +60,7 @@ export default function UIProvider({ children }: { children: React.ReactNode }) 
 
   return (
     <Ctx.Provider value={value}>
+      <Suspense fallback={null}><EditModeReader onChange={setIsEdit} /></Suspense>
       {children}
       <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
       <ProjectModal

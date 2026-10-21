@@ -11,8 +11,7 @@ import {
   cityDescription,
   cityPath,
   cityTitle,
-  getCity,
-  hoursLabel
+  getCity
 } from '@/lib/seo'
 
 export const dynamicParams = false
@@ -53,16 +52,16 @@ export default async function CityPage({ params }: Props) {
     {
       q: `Do you photograph weddings in ${short}?`,
       a:
-        c.slug === 'chennai'
-          ? `Yes. Chennai is our home base, so we cover weddings, receptions, engagements and pre-wedding shoots across the city and nearby coast.`
-          : `Yes. We travel from Chennai to ${short}, ${hoursLabel(c.hours)}, for weddings, engagements, pre-wedding shoots and portraits.`
+        ['chennai', 'coimbatore'].includes(c.slug)
+          ? `Yes. ${short} is one of our home bases. We cover weddings, receptions, engagements and pre-wedding shoots across the city.`
+          : `Yes. Based in Chennai and Coimbatore, we travel to ${short} for weddings, engagements, pre-wedding shoots and portraits.`
     },
     {
-      q: `Which locations are best for a pre-wedding shoot in ${short}?`,
-      a: `Popular choices include ${c.spots
+      q: `How do we choose a pre-wedding location in ${short}?`,
+      a: `Ideas to discuss include ${c.spots
         .slice(0, 3)
         .map((s) => s.name)
-        .join(', ')}. We help you choose based on season, light and the style you want.`
+        .join(', ')}. The final choice depends on access, permissions, light and your plans. A listed place is not a confirmed shoot location.`
     },
     {
       q: `How do I book a photographer for ${short}?`,
@@ -76,13 +75,13 @@ export default async function CityPage({ params }: Props) {
         data={[
           {
             '@context': 'https://schema.org',
-            '@type': 'ProfessionalService',
+            '@type': 'Service',
             '@id': `${url}#service`,
             name: `${BRAND.name} — Photographer in ${short}`,
             url,
             description: cityDescription(c),
             provider: { '@id': `${SITE_URL}/#business` },
-            areaServed: { '@type': 'City', name: short, containedInPlace: { '@type': 'State', name: BRAND.region } },
+            areaServed: { '@type': 'City', name: short },
             serviceType: c.shoots
           },
           {
@@ -110,11 +109,7 @@ export default async function CityPage({ params }: Props) {
           Wedding &amp; pre-wedding photographer in <span className="italic text-accent">{short}</span>
         </h1>
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink/80 md:text-lg">{c.intro}</p>
-        {c.hours > 0 && (
-          <p className="mt-3 text-sm text-mute">
-            {short} is {hoursLabel(c.hours)}.
-          </p>
-        )}
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-mute">Based in Chennai and Coimbatore, serving all of Tamil Nadu. Share your venue and date to discuss availability, coverage and travel.</p>
         <div className="mt-8 flex flex-wrap gap-4">
           <ContactButton label={`Book a shoot in ${short}`} />
           <Link href="/work" className="btn-ghost">
@@ -124,8 +119,9 @@ export default async function CityPage({ params }: Props) {
 
         <section className="mt-20" aria-labelledby="spots">
           <h2 id="spots" className="font-serif text-3xl tracking-tight md:text-4xl">
-            Photo locations in {short}
+            Planning your shoot in {short}
           </h2>
+          <p className="mt-4 text-sm leading-relaxed text-mute">These are setting ideas to discuss. Temple, heritage-site, private-property and commercial photography rules vary. Confirm current access, permissions and fees before making plans.</p>
           <ul className="mt-8 grid gap-x-10 gap-y-6 md:grid-cols-2">
             {c.spots.map((s) => (
               <li key={s.name} className="border-t border-line pt-4">

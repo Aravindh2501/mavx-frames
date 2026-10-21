@@ -1,14 +1,13 @@
 'use client'
 
+import { isConcept, projectAlt } from '@/lib/projectSeo'
+
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import gsap from 'gsap'
-import { useGSAP } from '@gsap/react'
+import { gsap, useGSAP } from '@/lib/gsap'
 import Photo from './Photo'
 import { useUI } from './UIProvider'
 import type { Project } from '@/lib/types'
-
-gsap.registerPlugin(useGSAP)
 
 const INTERVAL = 5500
 
@@ -67,8 +66,8 @@ export default function WorkHero({ slides }: { slides: Project[] }) {
   return (
     <section ref={root} className="work-landing relative w-full overflow-hidden bg-black">
       {slides.map((p, i) => (
-        <div key={p.id} className="wh-slide absolute inset-0 opacity-0" style={{ visibility: 'hidden' }}>
-          <Photo src={p.cover} alt={p.title} priority={i === 0} sizes="100vw" className="object-cover" />
+        <div key={p.id} className="wh-slide absolute inset-0" style={{ opacity: i === 0 ? 1 : 0, visibility: i === 0 ? 'visible' : 'hidden' }}>
+          <Photo src={p.cover} alt={projectAlt(p)} priority={i === 0} sizes="100vw" className="object-cover" />
         </div>
       ))}
 
@@ -77,14 +76,14 @@ export default function WorkHero({ slides }: { slides: Project[] }) {
       <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-center px-6 pb-28 text-center text-white md:pb-32">
         <div className="overflow-hidden">
           <p className="wh-line text-[11px] uppercase tracking-[0.3em] text-white/80">
-            {current.category}
+            {isConcept(current) ? 'AI-generated concept' : current.category}
             {current.location ? ` · ${current.location}` : ''}
           </p>
         </div>
         <div className="mt-4 overflow-hidden py-[0.06em]">
-          <h1 className="wh-line max-w-[18ch] font-serif text-[clamp(2.8rem,8vw,7rem)] leading-[0.98] tracking-[-0.03em]">
+          <h2 className="wh-line max-w-[18ch] font-serif text-[clamp(2.8rem,8vw,7rem)] leading-[0.98] tracking-[-0.03em]">
             {current.title}
-          </h1>
+          </h2>
         </div>
         <Link
           href={href(`/work/${current.slug}`)}

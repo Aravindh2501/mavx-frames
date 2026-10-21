@@ -43,6 +43,9 @@ export default function Footer({
               About
             </Link>
 
+            <Link href={href('/services')} className={navLink}>Services</Link>
+            <Link href={href('/faq')} className={navLink}>FAQ</Link>
+            <Link href={href('/contact')} className={navLink}>Contact</Link>
             <button onClick={openContact} className={navLink}>
               Let’s talk
             </button>
@@ -51,13 +54,13 @@ export default function Footer({
 
         {variant === 'home' ? (
           <div className="flex w-full flex-col items-start gap-3 lg:w-auto lg:items-end">
-            <span className="text-xs text-mute">Have a story?</span>
+            <span className="text-xs text-mute">Have a date in mind?</span>
 
             <button
               onClick={openContact}
               className="flex items-center gap-2 text-left font-serif text-lg italic text-accent sm:text-xl lg:text-right"
             >
-              Let’s make it unforgettable
+              Let’s make it yours.
               <ArrowUpRight width={16} height={16} className="shrink-0" />
             </button>
 
@@ -65,25 +68,31 @@ export default function Footer({
               onClick={openContact}
               className="btn-solid mt-1 min-h-[44px]"
             >
-              Start a conversation
+              Check availability
             </button>
           </div>
         ) : (
           <div className="-ml-3 flex items-center gap-1 text-ink lg:ml-0">
-            <a href={site.instagram} aria-label="Instagram" className={social}>
+            {site.instagram && (<a href={site.instagram} aria-label="Instagram" className={social}>
               <InstagramIcon />
-            </a>
+            </a>)}
 
-            <a href={site.youtube} aria-label="YouTube" className={social}>
+            {site.youtube && (<a href={site.youtube} aria-label="YouTube" className={social}>
               <YoutubeIcon />
-            </a>
+            </a>)}
 
-            <a href={site.email} aria-label="Email" className={social}>
+            {site.email && (<a href={site.email} aria-label="Email" className={social}>
               <MailIcon />
-            </a>
+            </a>)}
           </div>
         )}
       </div>
+      <div className="mx-auto flex max-w-[1280px] flex-wrap gap-x-6 gap-y-3 px-5 pb-5 text-sm text-mute sm:px-6 md:px-10">
+        {site.phone && <a href={`tel:${site.phone.replace(/[^+0-9]/g, '')}`} className="hover:text-accent">{site.phone === '+916369754272' ? '+91 63697 54272' : site.phone}</a>}
+        {site.email && <a href={site.email} className="hover:text-accent">{site.email.replace('mailto:', '')}</a>}
+        {site.instagram && <a href={site.instagram} className="hover:text-accent">Instagram</a>}
+      </div>
+      <p className="mx-auto max-w-[1280px] px-5 pb-8 text-xs leading-relaxed text-mute sm:px-6 md:px-10">MAVX Frames · Chennai &amp; Coimbatore · Photography and films across Tamil Nadu.</p>
     </footer>
   )
 }

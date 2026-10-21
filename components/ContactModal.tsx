@@ -1,13 +1,9 @@
-// components/ContactModal.tsx
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
-import { useGSAP } from '@gsap/react'
+import { gsap, useGSAP } from '@/lib/gsap'
 import { CloseIcon } from './Icons'
 import { site } from '@/lib/site'
-
-gsap.registerPlugin(useGSAP)
 
 type Status = 'idle' | 'sending' | 'done' | 'error'
 
@@ -105,7 +101,7 @@ export default function ContactModal({
             <div className="flex h-full min-h-[280px] flex-col justify-center sm:min-h-[320px]">
               <h2 className="font-serif text-3xl">Thank you.</h2>
               <p className="mt-3 text-sm text-mute">
-                Your note has reached me. I’ll get back to you very soon.
+                Your enquiry has been received. We’ll contact you to discuss your shoot.
               </p>
               <button onClick={close} className="btn-ghost mt-6 min-h-[44px] self-start">
                 Close
@@ -114,15 +110,16 @@ export default function ContactModal({
           ) : (
             <form onSubmit={submit} className="flex flex-col gap-3">
               <h2 className="pr-10 font-serif text-2xl leading-tight sm:text-3xl">
-                Let’s make something real.
+                Tell us what you’re planning.
               </h2>
               <p className="mb-2 text-xs text-mute">
-                Tell me a bit about your plans and I’ll get back to you soon.
+                Share your date, venue and ideas. We’ll take it from there.
               </p>
               <input
                 required
                 className="field"
                 placeholder="Your name"
+                aria-label="Your name"
                 autoComplete="name"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -131,11 +128,13 @@ export default function ContactModal({
                 required
                 className="field"
                 placeholder="Email or phone"
+                aria-label="Email or phone"
                 autoComplete="email"
                 value={form.contact}
                 onChange={(e) => setForm({ ...form, contact: e.target.value })}
               />
               <select
+                aria-label="Shoot type"
                 className="field"
                 value={form.type}
                 onChange={(e) => setForm({ ...form, type: e.target.value })}
@@ -149,7 +148,8 @@ export default function ContactModal({
               </select>
               <textarea
                 className="field min-h-[110px] resize-y"
-                placeholder="Tell me about your idea"
+                placeholder="Shoot date, city, venue and what you have in mind"
+                aria-label="Shoot date, venue and requirements"
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
               />

@@ -32,7 +32,7 @@ const make = (
   title,
   category,
   location,
-  description,
+  description: `AI-generated visual concept exploring ${category.toLowerCase()}. A mood reference, not a photographed client project.`,
   shape,
   cover: photo(slug),
   photos: (collections[slug] ?? [slug]).map(photo),

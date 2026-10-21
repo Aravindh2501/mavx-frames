@@ -1,0 +1,9 @@
+import { services, faqs } from '@/lib/content'
+import { site } from '@/lib/site'
+import Footer from '@/components/Footer'
+import ContactButton from '@/components/ContactButton'
+import JsonLd from '@/components/JsonLd'
+import { pageMetadata, SITE_URL } from '@/lib/seo'
+
+export const metadata = pageMetadata("Photography & Film Services", "Wedding, portrait, event and brand photography, films and reels in Chennai and Coimbatore. Explore MAVX Frames services across Tamil Nadu.", '/services')
+export default function Page() { return <main><JsonLd data={[{ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL }, { '@type': 'ListItem', position: 2, name: 'Services', item: `${SITE_URL}/services` }] }, ...services.map(s => ({ '@context': 'https://schema.org', '@type': 'Service', '@id': `${SITE_URL}/services#${s.id}`, name: s.title, description: s.text, serviceType: s.title, provider: { '@id': `${SITE_URL}/#business` }, areaServed: { '@type': 'State', name: 'Tamil Nadu' } }))]} /><article className="mx-auto max-w-[1000px] px-5 pb-24 pt-32 sm:px-6 md:px-10 md:pt-40"><h1 className="font-serif text-5xl leading-tight md:text-6xl">Your occasion. Your kind of story.</h1><p className="mt-6 max-w-2xl text-lg leading-relaxed text-mute">Photography and films in Chennai, Coimbatore and across Tamil Nadu. Tell us what matters to you; we will start there.</p><div className="mt-14 space-y-12">{services.map(s => <section id={s.id} key={s.id} className="scroll-mt-28"><h2 className="font-serif text-3xl">{s.title}</h2><p className="mt-3 text-lg text-ink/85">{s.text}</p><p className="mt-4 max-w-2xl text-base leading-relaxed text-mute">{s.details}</p></section>)}</div><div className="mt-14"><ContactButton label="Plan your shoot" /></div></article><Footer variant="simple" /></main> }

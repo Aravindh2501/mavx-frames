@@ -1,16 +1,13 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
-import { useGSAP } from '@gsap/react'
+import { gsap, useGSAP } from '@/lib/gsap'
 import { CloseIcon, PlusIcon, TrashIcon } from './Icons'
 import { api } from '@/lib/client'
 import { thumbUrl } from '@/lib/cloudinary'
 import { uploadMedia } from '@/lib/upload'
 import { CATEGORIES, SHAPES } from '@/lib/types'
 import type { Project, Reel, Shape } from '@/lib/types'
-
-gsap.registerPlugin(useGSAP)
 
 interface Draft {
   title: string

@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  outputFileTracingIncludes: { '/*': ['./data/projects.json'] },
   eslint: { ignoreDuringBuilds: true },
   images: {
     remotePatterns: [
