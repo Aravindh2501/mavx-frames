@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { WEDDINGS_ENABLED } from '@/lib/focus'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Footer from '@/components/Footer'
@@ -46,7 +47,7 @@ export default async function CityPage({ params }: Props) {
     .sort((a, b) => Math.abs(a.hours - c.hours) - Math.abs(b.hours - c.hours))
     .slice(0, 6)
 
-  const faqs = [
+  const weddingFaqs = [
     {
       q: `Do you photograph weddings in ${short}?`,
       a:
@@ -66,6 +67,28 @@ export default async function CityPage({ params }: Props) {
       a: `Send us your date, venue and the type of shoot using the enquiry form. We will reply with availability, travel details and a quote.`
     }
   ]
+
+  const soloFaqs = [
+    {
+      q: `Do you photograph portraits and fashion in ${short}?`,
+      a: ['chennai', 'coimbatore'].includes(c.slug)
+        ? `Yes. ${short} is one of our home bases. We shoot portraits, fashion, reels and product work across the city.`
+        : `Yes. Based in Chennai and Coimbatore, we travel to ${short} for portraits, fashion shoots and reels.`
+    },
+    {
+      q: `How do we choose a shoot location in ${short}?`,
+      a: `Ideas to discuss include ${c.spots
+        .slice(0, 3)
+        .map((s) => s.name)
+        .join(', ')}. The final choice depends on access, permissions, light and your plans. A listed place is not a confirmed shoot location.`
+    },
+    {
+      q: `How do I book a photographer for ${short}?`,
+      a: `Send us your date, location and the type of shoot using the enquiry form. We will reply with availability, travel details and a quote.`
+    }
+  ]
+
+  const faqs = WEDDINGS_ENABLED ? weddingFaqs : soloFaqs
 
   return (
     <main>
@@ -104,7 +127,7 @@ export default async function CityPage({ params }: Props) {
 
       <article className="mx-auto max-w-[1000px] px-6 pb-24 pt-32 md:px-10 md:pt-40">
         <h1 className="font-serif text-[clamp(2.4rem,6vw,4.8rem)] leading-[1.05] tracking-[-0.04em]">
-          Wedding &amp; pre-wedding photographer in <span className="italic text-accent">{short}</span>
+          {WEDDINGS_ENABLED ? 'Wedding & pre-wedding' : 'Portrait & fashion'} photographer in <span className="italic text-accent">{short}</span>
         </h1>
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink/80 md:text-lg">{c.intro}</p>
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-mute">Based in Chennai and Coimbatore, serving all of Tamil Nadu. Share your venue and date to discuss availability, coverage and travel.</p>

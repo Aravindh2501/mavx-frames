@@ -1,3 +1,5 @@
+import { WEDDINGS_ENABLED } from './focus'
+
 export type Shape =
   | 'tall'
   | 'wide'
@@ -29,7 +31,7 @@ export interface Project {
 
 export type ProjectInput = Omit<Project, 'id' | 'slug' | 'createdAt'>
 
-export const CATEGORIES = [
+const WEDDING_CATEGORIES = [
   'Weddings',
   'Pre-wedding',
   'Engagement',
@@ -40,6 +42,10 @@ export const CATEGORIES = [
   'Fashion',
   'Details'
 ]
+
+const SOLO_CATEGORIES = ['Portraits', 'Fashion', 'Reels', 'Birthdays', 'Commercial', 'Events', 'Details']
+
+export const CATEGORIES = WEDDINGS_ENABLED ? WEDDING_CATEGORIES : SOLO_CATEGORIES
 
 export const SHAPES: { value: Shape; label: string }[] = [
   { value: 'tall', label: 'Vertical rectangle' },

@@ -1,4 +1,5 @@
 import { pageMetadata } from '@/lib/seo'
+import { WEDDINGS_ENABLED } from '@/lib/focus'
 import { Suspense } from 'react'
 import WorkHero from '@/components/WorkHero'
 import WorkGallery from '@/components/WorkGallery'
@@ -8,7 +9,7 @@ import { getImageRatios } from '@/lib/imageSize'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata = pageMetadata('Photography Portfolio', 'Explore MAVX Frames portraits, wedding concepts and visual stories. Photography in Chennai and Coimbatore, serving Tamil Nadu.', '/work')
+export const metadata = pageMetadata('Photography Portfolio', WEDDINGS_ENABLED ? 'Explore MAVX Frames portraits, wedding concepts and visual stories. Photography in Chennai and Coimbatore, serving Tamil Nadu.' : 'Explore MAVX Frames portraits, fashion and reel work. Photography in Chennai and Coimbatore, serving Tamil Nadu.', '/work')
 
 export default async function WorkPage() {
   const projects = await getProjects()

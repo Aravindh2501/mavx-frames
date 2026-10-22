@@ -7,6 +7,7 @@ import ContactButton from '@/components/ContactButton'
 import JsonLd from '@/components/JsonLd'
 import { BRAND, SITE_URL, pageMetadata } from '@/lib/seo'
 import { site } from '@/lib/site'
+import { WEDDINGS_ENABLED } from '@/lib/focus'
 
 export const metadata = pageMetadata('About Aravindh & MAVX Frames', 'Meet Aravindh, founder of MAVX Frames. Photography and films in Chennai and Coimbatore, with shoots across Tamil Nadu.', '/about')
 
@@ -44,7 +45,7 @@ export default function AboutPage() {
         <p className="mt-8 text-base leading-[1.8] text-ink/85 md:mt-12 md:text-lg">{site.aboutText}</p>
 
         <p className="mt-5 text-base leading-[1.8] text-mute md:mt-6">
-          Based in {BRAND.base}, travelling for weddings, pre-wedding shoots, portraits and events across{' '}
+          Based in {BRAND.base}, travelling for {WEDDINGS_ENABLED ? 'weddings, pre-wedding shoots, portraits and events' : 'portraits, fashion shoots, reels and birthday sessions'} across{' '}
           {BRAND.region}.
         </p>
 

@@ -5,6 +5,7 @@ import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap'
 import { clampRatio, useImageRatios } from '@/lib/imageRatio'
 import Photo from './Photo'
 import { BRAND } from '@/lib/seo'
+import { WEDDINGS_ENABLED } from '@/lib/focus'
 
 export interface HeroImage {
   src: string
@@ -106,7 +107,7 @@ export default function Hero({ pool, ratios: initial }: Props) {
                 <span className="hero-line block text-accent">frame.</span>
               </span>
             </h1>
-            <p className="mt-6 max-w-md text-base leading-relaxed text-mute">Wedding, portrait and brand photography. Films that bring you back. Based in Chennai and Coimbatore, travelling across Tamil Nadu.</p>
+            <p className="mt-6 max-w-md text-base leading-relaxed text-mute">{WEDDINGS_ENABLED ? 'Wedding, portrait and brand photography. Films that bring you back. Based in Chennai and Coimbatore, travelling across Tamil Nadu.' : 'Portrait, fashion and reel photography. Films that bring you back. Based in Chennai and Coimbatore, travelling across Tamil Nadu.'}</p>
           </div>
 
           <div className="home-hero-media">

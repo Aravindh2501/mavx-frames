@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { WEDDINGS_ENABLED } from './focus'
 
 // Set this to the final production origin before deploying (including www if used).
 const origin = new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.mavxframes.com')
@@ -12,8 +13,9 @@ export const BRAND = {
   base: 'Chennai and Coimbatore',
   region: 'Tamil Nadu',
   tagline: 'Your moments. Beautifully kept.',
-  description:
-    'Wedding, portrait and brand photography in Chennai and Coimbatore. MAVX Frames creates photographs and films across Tamil Nadu. Enquire about your shoot.',
+  description: WEDDINGS_ENABLED
+    ? 'Wedding, portrait and brand photography in Chennai and Coimbatore. MAVX Frames creates photographs and films across Tamil Nadu. Enquire about your shoot.'
+    : 'Portrait, fashion and reel photography in Chennai and Coimbatore. MAVX Frames creates photographs and reels for people and brands across Tamil Nadu. Enquire about your shoot.',
   ogImage: '/opengraph-image',
   logo: '/logo.png'
 }
@@ -29,7 +31,7 @@ export type City = {
 
 const WEDDING = ['Weddings', 'Pre-wedding shoots', 'Engagements', 'Portraits and events']
 
-export const CITIES: City[] = [
+const ALL_CITIES: City[] = [
   {
     slug: 'chennai',
     name: 'Chennai',
@@ -291,6 +293,31 @@ export const CITIES: City[] = [
   }
 ]
 
+const SOLO_SHOOTS = ['Portraits', 'Fashion shoots', 'Reels', 'Product and brand shoots', 'Birthday sessions']
+
+const soloNote = (note: string) =>
+  note.replace(/destination weddings/g, 'resort portraits').replace(/pre-wedding and family/g, 'portrait and family').replace(/pre-wedding/g, 'portrait')
+
+const soloIntro = (c: City) => {
+  const name = c.name.split(' (')[0]
+  if (c.slug === 'chennai') {
+    return 'Chennai is home base. We shoot portraits, fashion and reels across the city, from the beachfront and heritage streets to indoor studio setups.'
+  }
+  if (c.slug === 'coimbatore') {
+    return 'Coimbatore (Kovai) is our western base for portraits, fashion and reels, with green farmland, hills and city streets close by.'
+  }
+  return `${name} offers memorable backdrops for portraits, fashion and reels. Based in Chennai and Coimbatore, we travel to ${name} for shoots. Share your date and location and we will plan it together.`
+}
+
+export const CITIES: City[] = WEDDINGS_ENABLED
+  ? ALL_CITIES
+  : ALL_CITIES.map((c) => ({
+      ...c,
+      intro: soloIntro(c),
+      spots: c.spots.map((s) => ({ ...s, note: soloNote(s.note) })),
+      shoots: SOLO_SHOOTS
+    }))
+
 export const getCity = (slug: string) => CITIES.find((c) => c.slug === slug)
 
 export const cityPath = (slug: string) => `/photographer-in/${slug}`
@@ -304,13 +331,13 @@ export const hoursLabel = (h: number) => {
 }
 
 export const cityTitle = (c: City) =>
-  c.slug === 'chennai'
-    ? `Wedding & Pre-Wedding Photographer in Chennai | ${BRAND.name}`
-    : `Wedding & Pre-Wedding Photographer in ${c.name.split(' (')[0]} | ${BRAND.name}`
+  `${WEDDINGS_ENABLED ? 'Wedding & Pre-Wedding' : 'Portrait & Fashion'} Photographer in ${c.name.split(' (')[0]} | ${BRAND.name}`
 
 export const cityDescription = (c: City) => {
   const name = c.name.split(' (')[0]
-  return `Wedding, pre-wedding and portrait photography in ${name} by MAVX Frames. Based in Chennai and Coimbatore, serving Tamil Nadu. Check your date.`
+  return WEDDINGS_ENABLED
+    ? `Wedding, pre-wedding and portrait photography in ${name} by MAVX Frames. Based in Chennai and Coimbatore, serving Tamil Nadu. Check your date.`
+    : `Portrait, fashion and reel photography in ${name} by MAVX Frames. Based in Chennai and Coimbatore, serving Tamil Nadu. Check your date.`
 }
 
 export const absUrl = (path: string) => new URL(path, `${SITE_URL}/`).href

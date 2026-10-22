@@ -338,9 +338,9 @@ h1 .text-accent, h2 .text-accent, h3 .text-accent {
   background: radial-gradient(ellipse 42% 38% at 50% 50%, #d38ba247, transparent 70%);
   will-change: transform;
 }
-@media (prefers-reduced-motion: no-preference) {
+/* @media (prefers-reduced-motion: no-preference) {
   .quote-text, .quote-caption { visibility: hidden; }
-}
+} */
 .quote-word { display: inline-block; will-change: transform, filter; }
 .dark .portfolio-quote {
   background: radial-gradient(ellipse at 26% 0%, #ad59724d, transparent 65%), linear-gradient(120deg, #270b16, #641E32 48%, #330c1c);

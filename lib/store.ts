@@ -3,9 +3,13 @@ import path from 'path'
 import { defaultProjects } from './defaultProjects'
 import { db, hasDb } from './db'
 import { SHAPE_VALUES } from './types'
+import { SHOW_SAMPLE_PROJECTS, WEDDINGS_ENABLED } from './focus'
 import type { Project, ProjectInput, Reel, Shape } from './types'
 
 const file = path.join(process.cwd(), 'data', 'projects.json')
+
+const visible = (list: Project[]) =>
+  SHOW_SAMPLE_PROJECTS ? list : list.filter((p) => !p.id.startsWith('default-'))
 
 // Optional one-time seed: data/projects.json may be missing on the server (it is
 // usually git-ignored), so it is read at runtime instead of imported at build time.
@@ -84,7 +88,7 @@ async function client() {
   const seeded = await c.execute({ sql: 'SELECT value FROM mavx_meta WHERE key = ?', args: ['projects-seeded'] })
   if (!seeded.rows.length) {
     const count = await c.execute('SELECT COUNT(*) AS n FROM mavx_projects')
-    const seed = await loadSeed()
+    const seed = visible(await loadSeed())
     if (Number((count.rows[0] as unknown as Row).n) === 0 && seed.length) {
       await c.batch(
         seed.map((p) => ({ sql: insertSql, args: insertArgs(p) })),
@@ -137,13 +141,13 @@ export async function getProjects(): Promise<Project[]> {
     try {
       const c = await client()
       const res = await c.execute('SELECT * FROM mavx_projects ORDER BY created_at DESC')
-      return normalize(res.rows.map((r) => toProject(r as unknown as Row)))
+      return visible(normalize(res.rows.map((r) => toProject(r as unknown as Row))))
     } catch (err) {
       console.error('[store] getProjects failed', err)
-      return normalize(await loadSeed())
+      return visible(normalize(await loadSeed()))
     }
   }
-  return normalize(await readFileList())
+  return visible(normalize(await readFileList()))
 }
 
 export async function getProject(slug: string) {
@@ -184,7 +188,7 @@ export function sanitize(body: unknown): ProjectInput | null {
   const shape = SHAPE_VALUES.includes(b.shape as Shape) ? (b.shape as Shape) : 'tall'
   return {
     title,
-    category: text(b.category, 40) || 'Weddings',
+    category: text(b.category, 40) || (WEDDINGS_ENABLED ? 'Weddings' : 'Portraits'),
     location: text(b.location, 80),
     description: text(b.description, 600),
     cover,
