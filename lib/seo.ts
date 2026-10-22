@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { WEDDINGS_ENABLED } from './focus'
 
 // Set this to the final production origin before deploying (including www if used).
-const origin = new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.mavxframes.com')
+const origin = new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://mavx-frames.vercel.app')
 if (!['https:', 'http:'].includes(origin.protocol)) throw new Error('NEXT_PUBLIC_SITE_URL must be an HTTP(S) URL')
 export const SITE_URL = origin.origin
 export const IS_PREVIEW = process.env.VERCEL_ENV === 'preview'

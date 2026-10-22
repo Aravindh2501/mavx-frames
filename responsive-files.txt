@@ -1074,7 +1074,7 @@ export default function UIProvider({ children }: { children: React.ReactNode }) 
 }
 
 === lib/seo.ts ===
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.mavxframes.com').replace(/\/$/, '')
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://mavx-frames.vercel.app').replace(/\/$/, '')
 
 export const BRAND = {
   name: 'MAVX Frames',

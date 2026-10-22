@@ -10,7 +10,7 @@ The existing locked dependencies are preserved to avoid an unrelated framework m
 
 ## Required configuration
 
-1. Set `NEXT_PUBLIC_SITE_URL` to your actual primary production origin. The existing fallback `https://www.mavxframes.com` is retained, but domain ownership and DNS are not verified. Match this value to the domain that your Vercel redirects resolve to.
+1. Set `NEXT_PUBLIC_SITE_URL` to your actual primary production origin. The existing fallback `https://mavx-frames.vercel.app` is retained, but domain ownership and DNS are not verified. Match this value to the domain that your Vercel redirects resolve to.
 2. Optional public details: `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_CONTACT_PHONE`, `NEXT_PUBLIC_INSTAGRAM_URL`, `NEXT_PUBLIC_YOUTUBE_URL`. Empty values are hidden. Provide full profile URLs, not platform homepages.
 3. Keep existing Cloudinary, Turso and enquiry settings. Test a real enquiry and confirm receipt after deploying. Live integrations were not tested with private credentials.
 4. Redeploy after changing environment variables. Keep production publicly accessible; preview deployments are noindex.
