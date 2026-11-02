@@ -10,6 +10,12 @@ export type Shape =
   | 'slant'
   | 'triangle'
 
+
+  export interface Project {
+  coverPosition?: { x: number; y: number }
+}
+
+
 export interface Reel {
   src: string
   poster?: string
@@ -23,6 +29,7 @@ export interface Project {
   location: string
   description: string
   cover: string
+  coverPosition?: { x: number; y: number }
   photos: string[]
   reels: Reel[]
   shape: Shape

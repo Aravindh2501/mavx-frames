@@ -9,9 +9,10 @@ interface Props {
   sizes?: string
   priority?: boolean
   className?: string
+  objectPosition?: string
 }
 
-export default function Photo({ src, alt, sizes = '100vw', priority, className }: Props) {
+export default function Photo({ src, alt, sizes = '100vw', priority, className, objectPosition }: Props) {
   const safeSrc = src || '/images/a-love-quietly-told.png'
   const cld = isCloudinary(safeSrc)
   return (
@@ -22,6 +23,7 @@ export default function Photo({ src, alt, sizes = '100vw', priority, className }
       sizes={sizes}
       priority={priority}
       className={className}
+      style={objectPosition ? { objectPosition } : undefined}
       loader={cld ? cloudinaryLoader : undefined}
       unoptimized={!cld && !safeSrc.startsWith('/')}
       draggable={false}

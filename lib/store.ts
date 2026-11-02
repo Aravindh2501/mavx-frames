@@ -58,6 +58,7 @@ const toProject = (r: Row): Project => ({
   location: String(r.location ?? ''),
   description: String(r.description ?? ''),
   cover: String(r.cover),
+    coverPosition: parsePosition(r.cover_position),
   photos: JSON.parse(String(r.photos || '[]')),
   reels: JSON.parse(String(r.reels || '[]')),
   shape: String(r.shape || 'tall') as Shape,
@@ -84,6 +85,7 @@ const insertArgs = (p: Project) => [
 
 async function client() {
   const c = await db()
+    await ensurePositionColumn(c)
   // First run only: copy the projects already in data/projects.json into Turso.
   const seeded = await c.execute({ sql: 'SELECT value FROM mavx_meta WHERE key = ?', args: ['projects-seeded'] })
   if (!seeded.rows.length) {
@@ -251,6 +253,25 @@ export async function updateProject(id: string, input: ProjectInput) {
   return next
 }
 
+export async function updateCoverPosition(id: string, coverPosition: CoverPosition) {
+  if (hasDb()) {
+    const c = await client()
+    const res = await c.execute({
+      sql: 'UPDATE mavx_projects SET cover_position = ? WHERE id = ?',
+      args: [JSON.stringify(coverPosition), id]
+    })
+    if (!res.rowsAffected) return null
+    const found = await c.execute({ sql: 'SELECT * FROM mavx_projects WHERE id = ?', args: [id] })
+    return toProject(found.rows[0] as unknown as Row)
+  }
+  const list = await readFileList()
+  const idx = list.findIndex((p) => p.id === id)
+  if (idx === -1) return null
+  const next = { ...list[idx], coverPosition }
+  list[idx] = next
+  await saveFileList(list)
+  return next
+}
 export async function deleteProject(id: string) {
   if (hasDb()) {
     const c = await client()
@@ -262,4 +283,29 @@ export async function deleteProject(id: string) {
   if (next.length === list.length) return false
   await saveFileList(next)
   return true
+}
+
+
+type CoverPosition = { x: number; y: number }
+
+const parsePosition = (v: unknown): CoverPosition | undefined => {
+  if (typeof v !== 'string' || !v) return undefined
+  try {
+    const p = JSON.parse(v)
+    const x = Number(p?.x)
+    const y = Number(p?.y)
+    return Number.isFinite(x) && Number.isFinite(y) ? { x, y } : undefined
+  } catch {
+    return undefined
+  }
+}
+
+let positionColumn: Promise<void> | null = null
+
+async function ensurePositionColumn(c: Awaited<ReturnType<typeof db>>) {
+  positionColumn ??= c
+    .execute('ALTER TABLE mavx_projects ADD COLUMN cover_position TEXT')
+    .then(() => undefined)
+    .catch(() => undefined)
+  await positionColumn
 }

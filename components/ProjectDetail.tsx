@@ -1,7 +1,7 @@
 'use client'
 
 import { isConcept, projectAlt } from '@/lib/projectSeo'
-
+import { api } from '@/lib/client'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/gsap'
@@ -13,6 +13,20 @@ import Footer from './Footer'
 import { ArrowLeft, ArrowRight, CloseIcon, PencilIcon } from './Icons'
 import { useUI } from './UIProvider'
 import type { Project } from '@/lib/types'
+
+type CoverPosition = { x: number; y: number }
+
+const DEFAULT_POSITION: CoverPosition = { x: 50, y: 0 }
+
+async function saveCoverPosition(id: string, position: CoverPosition) {
+  await fetch(`/api/projects/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ coverPosition: position })
+  })
+}
+
+const clampPercent = (v: number) => Math.min(100, Math.max(0, v))
 
 export default function ProjectDetail({
   project,
@@ -27,7 +41,16 @@ export default function ProjectDetail({
   const root = useRef<HTMLDivElement>(null)
   const overlay = useRef<HTMLDivElement>(null)
   const stage = useRef<HTMLDivElement>(null)
+  const heroBox = useRef<HTMLDivElement>(null)
+  const dragStart = useRef<{ x: number; y: number; px: number; py: number } | null>(null)
   const [lightbox, setLightbox] = useState<number | null>(null)
+  const [repositioning, setRepositioning] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [pos, setPos] = useState<CoverPosition>(project.coverPosition ?? DEFAULT_POSITION)
+
+
+
+  
 
   const gallery = useMemo(
     () => (project.photos.length ? project.photos : [project.cover]),
@@ -39,6 +62,11 @@ export default function ProjectDetail({
     () => layoutGallery(gallery.map((src) => clampRatio(ratios[src] ?? DEFAULT_RATIO, 0.5, 2.4))),
     [gallery, ratios]
   )
+
+  useEffect(() => {
+    setPos(project.coverPosition ?? DEFAULT_POSITION)
+    setRepositioning(false)
+  }, [project.id, project.coverPosition])
 
   useEffect(() => {
     if (lightbox === null) return
@@ -133,17 +161,99 @@ export default function ProjectDetail({
 
   const step = (delta: number) => setLightbox((i) => (i === null ? i : (i + delta + gallery.length) % gallery.length))
 
+  const onDragStart = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId)
+    dragStart.current = { x: e.clientX, y: e.clientY, px: pos.x, py: pos.y }
+  }
+
+  const onDragMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const start = dragStart.current
+    const box = heroBox.current
+    if (!start || !box) return
+    const { width: w, height: h } = box.getBoundingClientRect()
+    const ratio = ratios[project.cover] ?? DEFAULT_RATIO
+    const imgW = Math.max(w, h * ratio)
+    const imgH = imgW / ratio
+    const overflowX = imgW - w
+    const overflowY = imgH - h
+    const nx = overflowX > 1 ? clampPercent(start.px - ((e.clientX - start.x) / overflowX) * 100) : start.px
+    const ny = overflowY > 1 ? clampPercent(start.py - ((e.clientY - start.y) / overflowY) * 100) : start.py
+    setPos({ x: nx, y: ny })
+  }
+
+  const onDragEnd = () => {
+    dragStart.current = null
+  }
+
+ const savePosition = async () => {
+  setSaving(true)
+  try {
+    await api(`/api/projects/${project.id}`, { method: 'PATCH', body: { coverPosition: pos } })
+    setRepositioning(false)
+  } catch (err) {
+    window.alert((err as Error).message)
+  } finally {
+    setSaving(false)
+  }
+}
+
+  const cancelPosition = () => {
+    setPos(project.coverPosition ?? DEFAULT_POSITION)
+    setRepositioning(false)
+  }
+
   return (
     <div ref={root}>
       <section className="relative">
-        <div className="relative h-[72svh] min-h-[460px] w-full overflow-hidden">
+        <div ref={heroBox} className="relative h-[72svh] min-h-[460px] w-full overflow-hidden">
           <div className="pd-hero-img absolute inset-0">
-            <Photo src={project.cover} alt={projectAlt(project)} priority sizes="100vw" className="object-cover object-top" />
+            <Photo
+              src={project.cover}
+              alt={projectAlt(project)}
+              priority
+              sizes="100vw"
+              className="object-cover"
+              objectPosition={`${pos.x}% ${pos.y}%`}
+            />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-paper via-paper/85 to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-paper via-paper/85 to-transparent" />
+
+          {isEdit && repositioning && (
+            <div
+              data-lenis-prevent
+              onPointerDown={onDragStart}
+              onPointerMove={onDragMove}
+              onPointerUp={onDragEnd}
+              onPointerCancel={onDragEnd}
+              className="absolute inset-0 z-20 cursor-grab touch-none active:cursor-grabbing"
+            >
+              <div className="pointer-events-none absolute left-1/2 top-28 -translate-x-1/2 rounded-full bg-black/60 px-4 py-2 text-xs text-white">
+                Drag to choose what shows
+              </div>
+            </div>
+          )}
+
+          {isEdit && (
+            <div className="absolute right-6 top-24 z-30 flex gap-2">
+              {repositioning ? (
+                <>
+                  <button onClick={cancelPosition} disabled={saving} className="btn-ghost">
+                    Cancel
+                  </button>
+                  <button onClick={savePosition} disabled={saving} className="btn-solid">
+                    {saving ? 'Saving…' : 'Save position'}
+                  </button>
+                </>
+              ) : (
+                <button onClick={() => setRepositioning(true)} className="btn-solid">
+                  Move image
+                </button>
+              )}
+            </div>
+          )}
         </div>
-        <div className="relative -mt-44 px-6 text-center md:-mt-52">
+        <div className={`relative -mt-44 px-6 text-center md:-mt-52 ${repositioning ? 'pointer-events-none' : ''}`}>
           <div className="overflow-hidden">
             <p className="pd-line eyebrow text-ink">
               {project.category} / {project.location}
@@ -243,6 +353,7 @@ export default function ProjectDetail({
                 alt={projectAlt(next)}
                 sizes="(min-width:768px) 50vw, 100vw"
                 className="object-cover transition-transform duration-[900ms] group-hover:scale-[1.05]"
+                objectPosition={next.coverPosition ? `${next.coverPosition.x}% ${next.coverPosition.y}%` : undefined}
               />
             </div>
             <div>
